@@ -1,14 +1,25 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense, lazy } from 'react'
 import { useSettings } from '../hooks/useSettings'
 import { useAuth } from '../context/AuthContext'
 import styles from './Settings.module.css'
 
+const Onboarding = lazy(() => import('./Onboarding'))
+
+const ACTIVITY_LABELS = {
+  sedentary: 'Sedentary',
+  light: 'Light',
+  moderate: 'Moderate',
+  active: 'Active',
+  very_active: 'Very Active',
+}
+
 export default function Settings() {
   const { user, logout } = useAuth()
-  const { settings, loading, updateSettings } = useSettings()
+  const { settings, loading, updateSettings, refetch } = useSettings()
   const [form, setForm] = useState(settings)
-  const [saveState, setSaveState] = useState('idle') // idle | saving
+  const [saveState, setSaveState] = useState('idle')
   const [toast, setToast] = useState(null)
+  const [showBodyStats, setShowBodyStats] = useState(false)
   const toastTimerRef = useRef(null)
 
   useEffect(() => { setForm(settings) }, [settings])
@@ -46,6 +57,8 @@ export default function Settings() {
     }
   }
 
+  const hasStats = settings.weightKg && settings.heightCm && settings.age
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
@@ -54,11 +67,53 @@ export default function Settings() {
       </header>
 
       <div className={styles.profile}>
-        <img src={user?.photoURL} alt={user?.displayName} className={styles.avatar} referrerPolicy="no-referrer" />
+        <img
+          src={user?.picture}
+          alt={user?.name}
+          className={styles.avatar}
+          referrerPolicy="no-referrer"
+        />
         <div>
-          <p className={styles.name}>{user?.displayName}</p>
+          <p className={styles.name}>{user?.name}</p>
           <p className={styles.email}>{user?.email}</p>
         </div>
+      </div>
+
+      {/* Body Stats card */}
+      <div className={styles.form} style={{ marginBottom: 8 }}>
+        <div className={styles.statsTitleRow}>
+          <h2 className={styles.sectionTitle}>Body Stats</h2>
+          <button
+            type="button"
+            className={styles.editStatsBtn}
+            onClick={() => setShowBodyStats(true)}
+          >
+            {hasStats ? 'Edit' : 'Set Up'}
+          </button>
+        </div>
+
+        {hasStats ? (
+          <div className={styles.statsGrid}>
+            <div className={styles.statItem}>
+              <span className={styles.statVal}>{settings.weightKg} kg</span>
+              <span className={styles.statLabel}>Weight</span>
+            </div>
+            <div className={styles.statItem}>
+              <span className={styles.statVal}>{settings.heightCm} cm</span>
+              <span className={styles.statLabel}>Height</span>
+            </div>
+            <div className={styles.statItem}>
+              <span className={styles.statVal}>{settings.age} yrs</span>
+              <span className={styles.statLabel}>Age</span>
+            </div>
+            <div className={styles.statItem}>
+              <span className={styles.statVal}>{ACTIVITY_LABELS[settings.activityLevel] || 'Moderate'}</span>
+              <span className={styles.statLabel}>Activity</span>
+            </div>
+          </div>
+        ) : (
+          <p className={styles.statsEmpty}>Set your stats to get personalized goals</p>
+        )}
       </div>
 
       <form onSubmit={handleSave} className={styles.form}>
@@ -90,15 +145,18 @@ export default function Settings() {
         />
 
         <button type="submit" className={styles.saveBtn} disabled={saveState === 'saving'}>
-          {saveState === 'saving' && 'Saving…'}
-          {saveState === 'idle' && 'Save goals'}
+          {saveState === 'saving' ? 'Saving…' : 'Save goals'}
         </button>
       </form>
 
       <button className={styles.logoutBtn} onClick={logout}>Sign out</button>
 
       {toast && (
-        <div className={`${styles.toast} ${toast.kind === 'warn' ? styles.toastWarn : styles.toastSuccess}`} role="status" aria-live="polite">
+        <div
+          className={`${styles.toast} ${toast.kind === 'warn' ? styles.toastWarn : styles.toastSuccess}`}
+          role="status"
+          aria-live="polite"
+        >
           <span>{toast.message}</span>
           <button
             type="button"
@@ -109,6 +167,19 @@ export default function Settings() {
             ✕
           </button>
         </div>
+      )}
+
+      {showBodyStats && (
+        <Suspense fallback={null}>
+          <Onboarding
+            mode="update"
+            onComplete={async () => {
+              await refetch()
+              setShowBodyStats(false)
+              showToast('Stats & goals updated', 'success')
+            }}
+          />
+        </Suspense>
       )}
     </div>
   )

@@ -11,30 +11,70 @@ const DEFAULTS = {
   fatGoal: 65,
 }
 
+// Run migrations to add new columns if they don't exist
+;(async () => {
+  const migrations = [
+    `ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS weight_kg DECIMAL(5,1)`,
+    `ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS height_cm DECIMAL(5,1)`,
+    `ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS age INTEGER`,
+    `ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS gender VARCHAR(10)`,
+    `ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS activity_level VARCHAR(20) DEFAULT 'moderate'`,
+    `ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS goal_weight_kg DECIMAL(5,1)`,
+    `ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS has_onboarded BOOLEAN DEFAULT FALSE`,
+  ]
+  for (const sql of migrations) {
+    try {
+      await query(sql)
+    } catch (err) {
+      console.error('Migration failed:', sql, err.message)
+    }
+  }
+})()
+
 // Get user settings
 router.get('/', verifyToken, async (req, res) => {
   try {
     const userId = req.userId
 
     const result = await query(
-      `SELECT calorie_goal, protein_goal, carbs_goal, fat_goal
+      `SELECT calorie_goal, protein_goal, carbs_goal, fat_goal,
+              weight_kg, height_cm, age, gender, activity_level, goal_weight_kg, has_onboarded
        FROM user_settings
        WHERE user_id = $1`,
       [userId]
     )
 
     if (result.rows.length === 0) {
-      return res.json({ ok: true, settings: DEFAULTS })
+      return res.json({
+        ok: true,
+        settings: {
+          ...DEFAULTS,
+          weightKg: null,
+          heightCm: null,
+          age: null,
+          gender: null,
+          activityLevel: 'moderate',
+          goalWeightKg: null,
+          hasOnboarded: false,
+        },
+      })
     }
 
-    const settings = result.rows[0]
+    const s = result.rows[0]
     res.json({
       ok: true,
       settings: {
-        calorieGoal: settings.calorie_goal,
-        proteinGoal: settings.protein_goal,
-        carbsGoal: settings.carbs_goal,
-        fatGoal: settings.fat_goal,
+        calorieGoal: s.calorie_goal,
+        proteinGoal: s.protein_goal,
+        carbsGoal: s.carbs_goal,
+        fatGoal: s.fat_goal,
+        weightKg: s.weight_kg != null ? parseFloat(s.weight_kg) : null,
+        heightCm: s.height_cm != null ? parseFloat(s.height_cm) : null,
+        age: s.age,
+        gender: s.gender,
+        activityLevel: s.activity_level || 'moderate',
+        goalWeightKg: s.goal_weight_kg != null ? parseFloat(s.goal_weight_kg) : null,
+        hasOnboarded: s.has_onboarded || false,
       },
     })
   } catch (error) {
@@ -43,13 +83,12 @@ router.get('/', verifyToken, async (req, res) => {
   }
 })
 
-// Update user settings
+// Update user settings (goals only)
 router.post('/', verifyToken, async (req, res) => {
   try {
     const userId = req.userId
     const { calorieGoal, proteinGoal, carbsGoal, fatGoal } = req.body
 
-    // Check if settings exist
     const existRes = await query('SELECT id FROM user_settings WHERE user_id = $1', [userId])
 
     if (existRes.rows.length === 0) {
@@ -77,6 +116,69 @@ router.post('/', verifyToken, async (req, res) => {
   } catch (error) {
     console.error('Settings update error:', error)
     res.status(500).json({ error: 'Failed to update settings' })
+  }
+})
+
+// Onboarding — calculate goals from body stats and save everything
+router.post('/onboarding', verifyToken, async (req, res) => {
+  try {
+    const userId = req.userId
+    const { gender, age, weightKg, heightCm, activityLevel, goalWeightKg } = req.body
+
+    // Mifflin-St Jeor BMR
+    const bmr =
+      gender === 'male'
+        ? 10 * weightKg + 6.25 * heightCm - 5 * age + 5
+        : 10 * weightKg + 6.25 * heightCm - 5 * age - 161
+
+    const multipliers = {
+      sedentary: 1.2,
+      light: 1.375,
+      moderate: 1.55,
+      active: 1.725,
+      very_active: 1.9,
+    }
+    const tdee = bmr * (multipliers[activityLevel] || 1.55)
+
+    let calorieGoal
+    if (goalWeightKg && goalWeightKg < weightKg) {
+      calorieGoal = Math.round(tdee - 500)
+    } else if (goalWeightKg && goalWeightKg > weightKg + 2) {
+      calorieGoal = Math.round(tdee + 300)
+    } else {
+      calorieGoal = Math.round(tdee)
+    }
+    calorieGoal = Math.max(1200, calorieGoal)
+
+    const proteinGoal = Math.round(weightKg * 1.8)
+    const fatGoal = Math.round((calorieGoal * 0.25) / 9)
+    const carbsGoal = Math.max(50, Math.round((calorieGoal - proteinGoal * 4 - fatGoal * 9) / 4))
+
+    const existRes = await query('SELECT id FROM user_settings WHERE user_id = $1', [userId])
+
+    if (existRes.rows.length === 0) {
+      await query(
+        `INSERT INTO user_settings
+           (user_id, calorie_goal, protein_goal, carbs_goal, fat_goal,
+            weight_kg, height_cm, age, gender, activity_level, goal_weight_kg, has_onboarded, updated_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,TRUE,NOW())`,
+        [userId, calorieGoal, proteinGoal, carbsGoal, fatGoal, weightKg, heightCm, age, gender, activityLevel, goalWeightKg || null]
+      )
+    } else {
+      await query(
+        `UPDATE user_settings
+         SET calorie_goal=$2, protein_goal=$3, carbs_goal=$4, fat_goal=$5,
+             weight_kg=$6, height_cm=$7, age=$8, gender=$9, activity_level=$10,
+             goal_weight_kg=$11, has_onboarded=TRUE, updated_at=NOW()
+         WHERE user_id=$1`,
+        [userId, calorieGoal, proteinGoal, carbsGoal, fatGoal, weightKg, heightCm, age, gender, activityLevel, goalWeightKg || null]
+      )
+    }
+
+    res.json({ ok: true, goals: { calorieGoal, proteinGoal, carbsGoal, fatGoal } })
+  } catch (error) {
+    console.error('Onboarding error:', error)
+    res.status(500).json({ error: 'Failed to save onboarding data' })
   }
 })
 

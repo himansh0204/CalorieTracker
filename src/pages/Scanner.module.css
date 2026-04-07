@@ -32,92 +32,6 @@
   margin: 0;
 }
 
-/* Camera */
-.viewfinder {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4/3;
-  background: #111;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-}
-
-.scanFrame {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 65%;
-  aspect-ratio: 2/1;
-  transform: translate(-50%, -60%);
-}
-
-.corner {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-color: #fff;
-  border-style: solid;
-  border-radius: 2px;
-}
-
-.corner[data-pos="tl"] { top: 0; left: 0; border-width: 3px 0 0 3px; }
-.corner[data-pos="tr"] { top: 0; right: 0; border-width: 3px 3px 0 0; }
-.corner[data-pos="bl"] { bottom: 0; left: 0; border-width: 0 0 3px 3px; }
-.corner[data-pos="br"] { bottom: 0; right: 0; border-width: 0 3px 3px 0; }
-
-.scanLine {
-  position: absolute;
-  left: 5%;
-  right: 5%;
-  height: 2px;
-  background: rgba(79,70,229,0.8);
-  box-shadow: 0 0 6px rgba(79,70,229,0.8);
-  animation: scanAnim 1.5s ease-in-out infinite;
-}
-
-@keyframes scanAnim {
-  0% { top: 5%; }
-  50% { top: 90%; }
-  100% { top: 5%; }
-}
-
-.hint {
-  position: absolute;
-  bottom: 12px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  color: rgba(255,255,255,0.8);
-  font-size: 0.85rem;
-  margin: 0;
-}
-
-.statusOverlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.75);
-  color: #fff;
-  gap: 12px;
-  padding: 20px;
-  text-align: center;
-}
 
 .statusIcon {
   font-size: 2.5rem;
@@ -147,21 +61,19 @@
 
 /* Add section */
 .addSection {
-  flex: 1;
-  background: var(--bg);
-  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
+  flex: 1;
 }
 
 .foodPill {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   background: var(--surface);
   border-radius: 14px;
-  padding: 12px 14px;
+  padding: 14px;
 }
 
 .foodImg {
@@ -179,19 +91,22 @@
 }
 
 .foodName {
-  margin: 0 0 2px;
+  margin: 0 0 3px;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.3;
 }
 
 .foodBrand {
   margin: 0;
   font-size: 0.72rem;
   color: var(--text-muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .rescan {
@@ -203,6 +118,7 @@
   padding: 6px 10px;
   cursor: pointer;
   flex-shrink: 0;
+  align-self: flex-start;
 }
 
 .formRow {
@@ -291,7 +207,7 @@
 
 .logBtn {
   width: 100%;
-  padding: 16px;
+  padding: 15px;
   background: var(--primary);
   color: #fff;
   border: none;
@@ -300,8 +216,240 @@
   font-weight: 700;
   cursor: pointer;
   margin-top: auto;
+  flex-shrink: 0;
 }
 
 .logBtn:disabled {
   opacity: 0.6;
+}
+
+/* ─── Tabs ─────────────────────────────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 12px 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tabActive {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* ─── AI Photo mode ─────────────────────────────────────────────────── */
+
+.scrollContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 16px 24px;
+  overflow: hidden;
+}
+
+/* Take Photo CTA card — square */
+.photoCta {
+  width: 160px;
+  height: 160px;
+  position: relative;
+  background: var(--surface);
+  border: 1.5px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: border-color 0.15s;
+  align-self: center;
+}
+
+.photoCta:hover:not(:disabled) {
+  border-color: var(--primary);
+}
+
+.photoCta:disabled {
+  cursor: default;
+}
+
+.photoPreview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Overlay shown always when no image; shown on hover when image exists */
+.photoOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+/* When image is present and not analyzing — hide overlay, show on hover */
+.photoOverlayHover {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.photoCta:hover .photoOverlayHover {
+  opacity: 1;
+}
+
+.photoCtaIcon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.photoCtaLabel {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.photoCtaSub {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.aiSuccess {
+  font-size: 0.78rem;
+  color: #10b981;
+  text-align: center;
+  margin: 0;
+  font-weight: 600;
+}
+
+.aiError {
+  font-size: 0.78rem;
+  color: #ef4444;
+  text-align: center;
+  margin: 0;
+}
+
+/* AI badge */
+.aiBadge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.05em;
+}
+
+/* Meal name row */
+.nameRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.nameInput {
+  flex: 1;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  outline: none;
+  min-width: 0;
+}
+
+.nameInput::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.nameInput:focus {
+  border-color: var(--primary);
+}
+
+/* Editable nutrition grid */
+.editNutrients {
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.editHint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.editGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.editField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.editInputWrap {
+  display: flex;
+  align-items: center;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 0 8px 0 10px;
+}
+
+.editInput {
+  flex: 1;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  padding: 9px 4px 9px 0;
+  min-width: 0;
+  width: 0;
+  outline: none;
+}
+
+/* hide number spinners */
+.editInput::-webkit-inner-spin-button,
+.editInput::-webkit-outer-spin-button { -webkit-appearance: none; }
+.editInput[type=number] { -moz-appearance: textfield; }
+
+.editUnit {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  padding-left: 2px;
 }

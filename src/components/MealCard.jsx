@@ -6,11 +6,14 @@ const MEAL_ICONS = { breakfast: '🌅', lunch: '☀️', dinner: '🌙', snack: 
 export default function MealCard({ meal }) {
   const { removeMeal } = useFoodLog()
 
+  const name = meal.food_name || meal.name || 'Meal'
+  const icon = MEAL_ICONS[meal.meal_type] || MEAL_ICONS[meal.mealType] || '🍽️'
+
   return (
     <div className={styles.card}>
-      <span className={styles.icon}>{MEAL_ICONS[meal.mealType] || '🍽️'}</span>
+      <span className={styles.icon}>{icon}</span>
       <div className={styles.info}>
-        <span className={styles.name}>{meal.name}</span>
+        <span className={styles.name}>{name}</span>
         <span className={styles.macros}>
           P {Math.round(meal.protein)}g · C {Math.round(meal.carbs)}g · F {Math.round(meal.fat)}g
         </span>
@@ -19,7 +22,7 @@ export default function MealCard({ meal }) {
       <button
         className={styles.delete}
         onClick={() => removeMeal(meal.id)}
-        aria-label={`Remove ${meal.name}`}
+        aria-label={`Remove ${name}`}
       >✕</button>
     </div>
   )

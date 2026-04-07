@@ -1,7 +1,19 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
 
-const DEFAULTS = { calorieGoal: 2000, proteinGoal: 150, carbsGoal: 250, fatGoal: 65 }
+const DEFAULTS = {
+  calorieGoal: 2000,
+  proteinGoal: 150,
+  carbsGoal: 250,
+  fatGoal: 65,
+  hasOnboarded: false,
+  weightKg: null,
+  heightCm: null,
+  age: null,
+  gender: null,
+  activityLevel: 'moderate',
+  goalWeightKg: null,
+}
 const SETTINGS_TIMEOUT_MS = 7000
 const LOCAL_KEY_PREFIX = 'caltrack.settings'
 const SETTINGS_UPDATED_EVENT = 'caltrack:settings-updated'
@@ -35,7 +47,7 @@ export function useSettings() {
 
       if (!response.ok) throw new Error('Failed to fetch settings')
       const data = await response.json()
-      
+
       if (data.settings) {
         const merged = sanitizeSettings({ ...DEFAULTS, ...data.settings })
         setSettings(merged)
@@ -105,7 +117,7 @@ export function useSettings() {
     }
   }
 
-  return { settings, loading, updateSettings }
+  return { settings, loading, updateSettings, refetch: fetchSettings, hasOnboarded: settings.hasOnboarded }
 }
 
 function withTimeout(promise, timeoutMs) {
@@ -123,6 +135,13 @@ function sanitizeSettings(raw) {
     proteinGoal: toGoal(raw.proteinGoal, DEFAULTS.proteinGoal),
     carbsGoal: toGoal(raw.carbsGoal, DEFAULTS.carbsGoal),
     fatGoal: toGoal(raw.fatGoal, DEFAULTS.fatGoal),
+    hasOnboarded: raw.hasOnboarded === true,
+    weightKg: raw.weightKg != null ? Number(raw.weightKg) || null : null,
+    heightCm: raw.heightCm != null ? Number(raw.heightCm) || null : null,
+    age: raw.age != null ? Number(raw.age) || null : null,
+    gender: raw.gender || null,
+    activityLevel: raw.activityLevel || 'moderate',
+    goalWeightKg: raw.goalWeightKg != null ? Number(raw.goalWeightKg) || null : null,
   }
 }
 

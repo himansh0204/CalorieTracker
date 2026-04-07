@@ -3,8 +3,8 @@ import styles from './Layout.module.css'
 
 const navItems = [
   { to: '/', label: 'Home', short: 'HM', end: true },
-  { to: '/log', label: 'Log', short: 'LG' },
-  { to: '/scanner', label: 'Scan', short: 'SC' },
+  { to: '/scanner', label: 'Add Meal', short: 'ADD' },
+  { to: '/progress', label: 'Progress', short: 'PR' },
   { to: '/history', label: 'History', short: 'HS' },
   { to: '/settings', label: 'Settings', short: 'ST' },
 ]

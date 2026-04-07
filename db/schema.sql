@@ -15,6 +15,13 @@ CREATE TABLE IF NOT EXISTS user_settings (
   protein_goal INTEGER DEFAULT 150,
   carbs_goal INTEGER DEFAULT 250,
   fat_goal INTEGER DEFAULT 65,
+  weight_kg DECIMAL(5,1),
+  height_cm DECIMAL(5,1),
+  age INTEGER,
+  gender VARCHAR(10),
+  activity_level VARCHAR(20) DEFAULT 'moderate',
+  goal_weight_kg DECIMAL(5,1),
+  has_onboarded BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );

@@ -77,10 +77,10 @@ export function FoodLogProvider({ children }) {
 
   const totals = meals.reduce(
     (acc, m) => ({
-      calories: acc.calories + (m.calories || 0),
-      protein: acc.protein + (m.protein || 0),
-      carbs: acc.carbs + (m.carbs || 0),
-      fat: acc.fat + (m.fat || 0),
+      calories: acc.calories + (parseFloat(m.calories) || 0),
+      protein: acc.protein + (parseFloat(m.protein) || 0),
+      carbs: acc.carbs + (parseFloat(m.carbs) || 0),
+      fat: acc.fat + (parseFloat(m.fat) || 0),
     }),
     { calories: 0, protein: 0, carbs: 0, fat: 0 }
   )

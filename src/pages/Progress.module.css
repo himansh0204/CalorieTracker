@@ -1,0 +1,322 @@
+.page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 24px;
+}
+
+.header {
+  padding: 16px 18px 10px;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+}
+
+/* ── Period selector ── */
+.periodRow {
+  display: flex;
+  gap: 6px;
+  padding: 0 14px 14px;
+  overflow-x: auto;
+  flex-shrink: 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.periodRow::-webkit-scrollbar { display: none; }
+
+.periodBtn {
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.periodActive {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ── Loading / Error ── */
+.loadingWrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.errorWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 20px;
+}
+
+.errorMsg {
+  color: #ef4444;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.retryBtn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 24px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* ── Content ── */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 14px;
+}
+
+/* Total kcal row */
+.totalRow {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 4px 0;
+}
+
+.fireIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.totalKcal {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+}
+
+.kcalLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* ── Chart card ── */
+.chartCard {
+  background: var(--surface);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 16px 12px 12px;
+}
+
+/* ── Chart layout ── */
+.chartContainer {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.yAxis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 38px;
+  flex-shrink: 0;
+  padding-bottom: 22px; /* matches x-axis height */
+}
+
+.yLabel {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.chartBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.barsArea {
+  position: relative;
+  width: 100%;
+}
+
+.gridLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+.zeroLine {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Bars row — flex, aligned to bottom */
+.barsRow {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 0 2px;
+}
+
+.barCol {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 100%;
+}
+
+.bar {
+  width: 100%;
+  max-width: 32px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 4px 4px 0 0;
+  overflow: hidden;
+}
+
+.barEmpty {
+  width: 100%;
+  max-width: 32px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+}
+
+/* X-axis */
+.xAxis {
+  display: flex;
+  gap: 4px;
+  padding: 5px 2px 0;
+}
+
+.xLabel {
+  flex: 1;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+/* ── Legend ── */
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legendDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legendLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* ── Daily breakdown list ── */
+.breakdownList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 16px;
+}
+
+.breakdownRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.breakdownDate {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+}
+
+.breakdownMacros {
+  display: flex;
+  gap: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.breakdownCal {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text);
+  flex-shrink: 0;
+  min-width: 64px;
+  text-align: right;
+}
+
+.emptyMsg {
+  color: var(--text-muted);
+  text-align: center;
+  font-size: 0.9rem;
+  padding: 24px 0;
+  margin: 0;
+}

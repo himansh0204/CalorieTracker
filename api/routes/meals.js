@@ -1,8 +1,10 @@
 import express from 'express'
+import Groq from 'groq-sdk'
 import { query } from '../lib/db.js'
 import { verifyToken } from '../middleware/auth.js'
 
 const router = express.Router()
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
 // Log a meal
 router.post('/', verifyToken, async (req, res) => {
@@ -97,6 +99,77 @@ router.delete('/:mealId', verifyToken, async (req, res) => {
   } catch (error) {
     console.error('Delete meal error:', error)
     res.status(500).json({ error: 'Failed to delete meal' })
+  }
+})
+
+// Analyze a meal photo with Groq Vision
+router.post('/analyze-image', verifyToken, async (req, res) => {
+  try {
+    const { imageBase64 } = req.body
+    if (!imageBase64) {
+      return res.status(400).json({ error: 'imageBase64 is required' })
+    }
+
+    const response = await groq.chat.completions.create({
+      model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+      max_tokens: 500,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'image_url',
+              image_url: { url: imageBase64 },
+            },
+            {
+              type: 'text',
+              text: `Analyze this meal photo and estimate the nutritional content for what is visible.
+Respond ONLY with a valid JSON object in this exact format (no markdown, no explanation):
+{
+  "foodName": "descriptive meal name",
+  "description": "brief 1-sentence description",
+  "calories": <number>,
+  "protein": <number in grams>,
+  "carbs": <number in grams>,
+  "fat": <number in grams>,
+  "servingSize": "1 serving"
+}
+Use realistic estimates based on typical portion sizes. All nutrient values must be numbers.`,
+            },
+          ],
+        },
+      ],
+    })
+
+    const content = response.choices[0]?.message?.content?.trim()
+    if (!content) {
+      return res.status(502).json({ error: 'No response from AI' })
+    }
+
+    let parsed
+    try {
+      parsed = JSON.parse(content)
+    } catch {
+      const jsonMatch = content.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) {
+        return res.status(502).json({ error: 'Could not parse AI response' })
+      }
+      parsed = JSON.parse(jsonMatch[0])
+    }
+
+    res.json({
+      ok: true,
+      foodName: parsed.foodName || 'Unknown meal',
+      description: parsed.description || '',
+      calories: Math.round(Number(parsed.calories) || 0),
+      protein: Math.round(Number(parsed.protein) || 0),
+      carbs: Math.round(Number(parsed.carbs) || 0),
+      fat: Math.round(Number(parsed.fat) || 0),
+      servingSize: parsed.servingSize || '1 serving',
+    })
+  } catch (error) {
+    console.error('Image analysis error:', error)
+    res.status(500).json({ error: 'Failed to analyze image' })
   }
 })
 

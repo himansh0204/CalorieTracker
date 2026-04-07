@@ -1,88 +1,139 @@
-# CalTrack — Calorie Tracker App
+# CalTrack - Calorie Tracker App
 
-A mobile-first PWA for tracking daily calories and macros, built with React + Vite + Firebase.
+A mobile-first PWA for tracking daily calories and macros, built with React + Vite (frontend) and Node.js + Express + PostgreSQL (backend).
+
+## Live App
+
+- Production URL: https://calorie-tracker-three-delta.vercel.app
 
 ## Features
 
-- 🔐 Google Sign-in via Firebase Auth
-- 📊 Daily calorie & macro progress (protein, carbs, fat)
-- 🔍 Food search powered by Open Food Facts (2M+ products, no API key needed)
-- 📷 Barcode scanner via device camera
-- 📅 30-day meal history
-- ⚙️ Customizable daily goals
-- 📱 Installable PWA (works offline, add to home screen)
+- Google Sign-In (Google Identity + backend token verification)
+- Daily calorie and macro progress (protein, carbs, fat)
+- Food search powered by Open Food Facts (2M+ products)
+- Barcode scanner via device camera
+- 30-day meal history
+- Customizable daily goals
+- Built-in analytics events (meal logged/deleted, settings updated)
+- Installable PWA (service worker + manifest)
 
-## Setup
+## Architecture
 
-### 1. Firebase Project
+### Frontend
 
-1. Go to [Firebase Console](https://console.firebase.google.com/) → **Create project**
-2. Add a **Web app** → copy the config values
-3. Enable **Authentication** → Sign-in method → **Google**
-4. Enable **Firestore Database** → Start in production mode
-5. In Firestore → **Rules** tab, paste the contents of `firestore.rules`
+- React 18 + Vite
+- React Router v6
+- Context + hooks for auth, meals, and settings
+- API calls to `/api/*` with JWT bearer tokens
 
-### 2. Environment Variables
+### Backend
+
+- Node.js + Express (in `api/`)
+- PostgreSQL via `pg` (managed Neon in production)
+- JWT auth middleware
+- Google token verification via `google-auth-library`
+- REST endpoints for auth, meals, settings, analytics
+
+### Database
+
+Tables:
+- `users`
+- `user_settings`
+- `meals`
+- `analytics_events`
+
+Schema lives in `db/schema.sql` and is applied with `npm run db:migrate`.
+
+## Environment Variables
+
+Create `.env` from `.env.example` and set values:
 
 ```bash
 cp .env.example .env
 ```
 
-Open `.env` and fill in your Firebase config values:
+Required variables:
 
-```
-VITE_FIREBASE_API_KEY=...
-VITE_FIREBASE_AUTH_DOMAIN=...
-VITE_FIREBASE_PROJECT_ID=...
-VITE_FIREBASE_STORAGE_BUCKET=...
-VITE_FIREBASE_MESSAGING_SENDER_ID=...
-VITE_FIREBASE_APP_ID=...
+```bash
+# Frontend
+VITE_API_URL=http://localhost:3001/api
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
+
+# Backend
+NODE_ENV=development
+PORT=3001
+DATABASE_URL=your_postgres_connection_string
+JWT_SECRET=your_strong_random_secret
+GOOGLE_CLIENT_ID=your_google_client_id
+FRONTEND_URL=http://localhost:5173
 ```
 
-### 3. Run Locally
+## Local Development
 
 ```bash
 npm install
+npm run db:migrate
 npm run dev
 ```
 
-Open `http://localhost:5173` in your browser (or phone on the same Wi-Fi).
+`npm run dev` starts both:
+- frontend: `http://localhost:5173`
+- backend: `http://localhost:3001`
 
-### 4. Build & Deploy
+## API Endpoints
+
+- `POST /api/auth/google` - Google credential exchange, returns app JWT
+- `GET /api/health` - health check
+- `GET /api/meals` - fetch meals by date range
+- `POST /api/meals` - create meal log
+- `DELETE /api/meals/:mealId` - delete meal log
+- `GET /api/settings` - fetch user goals
+- `POST /api/settings` - upsert user goals
+- `GET /api/analytics/summary` - analytics summary
+- `POST /api/analytics/event` - track custom event
+
+## Deployment (Vercel)
+
+This repo is configured for Vercel full-stack deployment:
+
+- Frontend static output served from `dist/`
+- `/api/*` rewritten to Express entry at `api/index.js`
+- SPA fallback to `index.html`
+
+Deploy command:
 
 ```bash
-npm run build
+npx vercel deploy --prod --yes
 ```
 
-Deploy the `dist/` folder to any static host:
-- **Firebase Hosting**: `firebase deploy --only hosting`
-- **Vercel**: `vercel --prod`
-- **Netlify**: Drag & drop the `dist/` folder
+Before deploying, set env vars in Vercel:
+- `DATABASE_URL`
+- `JWT_SECRET`
+- `GOOGLE_CLIENT_ID`
+- `VITE_GOOGLE_CLIENT_ID`
+- `FRONTEND_URL`
 
 ## Project Structure
 
-```
+```text
+api/
+    index.js
+    lib/db.js
+    middleware/auth.js
+    routes/
+        auth.js
+        meals.js
+        settings.js
+        analytics.js
+db/
+    schema.sql
+    migrate.js
 src/
-├── context/
-│   ├── AuthContext.jsx       # Google auth state
-│   └── FoodLogContext.jsx    # Today's meals state
-├── hooks/
-│   └── useSettings.js        # Daily goal settings
-├── pages/
-│   ├── Login.jsx             # Google sign-in screen
-│   ├── Dashboard.jsx         # Home — rings + meal list
-│   ├── Log.jsx               # Food search + add meal
-│   ├── Scanner.jsx           # Barcode camera scanner
-│   ├── History.jsx           # 30-day history
-│   └── Settings.jsx          # Goal editor + sign out
-├── components/
-│   ├── Layout.jsx            # Shell + bottom nav
-│   ├── MacroRing.jsx         # SVG macro progress ring
-│   └── MealCard.jsx          # Single meal row
-└── services/
-    ├── firebase.js           # Firebase init
-    ├── firestoreService.js   # Firestore CRUD helpers
-    └── foodApi.js            # Open Food Facts API
+    context/
+    hooks/
+    pages/
+    components/
+    services/
 ```
 
 ## Tech Stack
@@ -90,9 +141,11 @@ src/
 | Layer | Tech |
 |-------|------|
 | Framework | React 18 + Vite |
-| Auth + DB | Firebase Auth + Firestore |
-| Food data | Open Food Facts API |
-| Barcode scan | @zxing/library |
+| Backend | Node.js + Express |
+| Auth | Google Identity + JWT |
+| Database | PostgreSQL (Neon) |
+| Food Data | Open Food Facts API |
+| Barcode Scan | @zxing/library |
 | Routing | React Router v6 |
 | Styling | CSS Modules |
-| PWA | Custom service worker + manifest |
+| Hosting | Vercel |

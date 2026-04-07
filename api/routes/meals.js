@@ -4,7 +4,11 @@ import { query } from '../lib/db.js'
 import { verifyToken } from '../middleware/auth.js'
 
 const router = express.Router()
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+let _groq = null
+function getGroq() {
+  if (!_groq) _groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+  return _groq
+}
 
 // Log a meal
 router.post('/', verifyToken, async (req, res) => {
@@ -110,7 +114,7 @@ router.post('/analyze-image', verifyToken, async (req, res) => {
       return res.status(400).json({ error: 'imageBase64 is required' })
     }
 
-    const response = await groq.chat.completions.create({
+    const response = await getGroq().chat.completions.create({
       model: 'meta-llama/llama-4-scout-17b-16e-instruct',
       max_tokens: 500,
       messages: [

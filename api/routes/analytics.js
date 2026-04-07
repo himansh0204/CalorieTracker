@@ -4,7 +4,11 @@ import { query } from '../lib/db.js'
 import { verifyToken } from '../middleware/auth.js'
 
 const router = express.Router()
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+let _groq = null
+function getGroq() {
+  if (!_groq) _groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+  return _groq
+}
 
 // Get user analytics summary
 router.get('/summary', verifyToken, async (req, res) => {
@@ -181,7 +185,7 @@ One clear, motivating goal for the coming week.
 
 Keep the tone warm, encouraging, and specific. Total length: around 150-200 words.`
 
-    const completion = await groq.chat.completions.create({
+    const completion = await getGroq().chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       max_tokens: 600,
       messages: [{ role: 'user', content: prompt }],

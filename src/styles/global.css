@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap');
+
+/* ---- Design tokens ---- */
+:root {
+  --primary: #d4b06a;
+  --primary-dark: #b99350;
+  --primary-soft: rgba(212, 176, 106, 0.16);
+  --bg: #06080d;
+  --surface: #11151d;
+  --surface-soft: #171d27;
+  --border: #232b37;
+  --text: #f2f5fb;
+  --text-secondary: #c4cedd;
+  --text-muted: #8a95a6;
+  --ring-bg: #2a3241;
+  --shadow-soft: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+/* ---- Reset ---- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+  background:
+    radial-gradient(circle at 12% -10%, rgba(212, 176, 106, 0.16), transparent 36%),
+    radial-gradient(circle at 85% -5%, rgba(61, 84, 130, 0.2), transparent 32%),
+    var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+
+input, select, button, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---- Utility ---- */
+.loading-screen {
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: globalSpin 0.7s linear infinite;
+}
+
+@keyframes globalSpin { to { transform: rotate(360deg); } }
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }

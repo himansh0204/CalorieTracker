@@ -1,0 +1,67 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  background:
+    radial-gradient(circle at 0% -10%, rgba(212, 176, 106, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 100% 0%, rgba(75, 105, 150, 0.18) 0%, transparent 35%),
+    var(--bg);
+}
+
+.main {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 92px;
+}
+
+.nav {
+  display: flex;
+  background: rgba(16, 20, 28, 0.94);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 8px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 12px;
+  width: min(456px, calc(100vw - 18px));
+  z-index: 20;
+  box-shadow: var(--shadow-soft);
+}
+
+.navItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 4px;
+  text-decoration: none;
+  color: var(--text-muted);
+  transition: color 0.15s, background 0.15s;
+  gap: 2px;
+  border-radius: 12px;
+}
+
+.navItem.active {
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.navIcon {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.navLabel {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}

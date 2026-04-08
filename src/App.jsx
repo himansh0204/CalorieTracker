@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react'
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { FoodLogProvider } from './context/FoodLogContext'
 import { useSettings } from './hooks/useSettings'
@@ -21,20 +21,12 @@ function ProtectedRoute({ children }) {
 }
 
 function OnboardingGate() {
-  const { hasOnboarded, loading, refetch } = useSettings()
-  const navigate = useNavigate()
+  const { hasOnboarded, loading, markOnboarded } = useSettings()
 
   if (loading) return <div className="loading-screen"><div className="spinner" /></div>
 
   if (!hasOnboarded) {
-    return (
-      <Onboarding
-        onComplete={async () => {
-          await refetch()
-          navigate('/', { replace: true })
-        }}
-      />
-    )
+    return <Onboarding onComplete={markOnboarded} />
   }
 
   return <Layout />

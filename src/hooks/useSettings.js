@@ -117,7 +117,13 @@ export function useSettings() {
     }
   }
 
-  return { settings, loading, updateSettings, refetch: fetchSettings, hasOnboarded: settings.hasOnboarded }
+  function markOnboarded() {
+    const next = { ...settings, hasOnboarded: true }
+    setSettings(next)
+    writeLocalSettings(key, next)
+  }
+
+  return { settings, loading, updateSettings, refetch: fetchSettings, hasOnboarded: settings.hasOnboarded, markOnboarded }
 }
 
 function withTimeout(promise, timeoutMs) {

@@ -11,29 +11,9 @@ const DEFAULTS = {
   fatGoal: 65,
 }
 
-const MIGRATIONS = [
-  `ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS weight_kg DECIMAL(5,1)`,
-  `ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS height_cm DECIMAL(5,1)`,
-  `ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS age INTEGER`,
-  `ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS gender VARCHAR(10)`,
-  `ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS activity_level VARCHAR(20) DEFAULT 'moderate'`,
-  `ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS goal_weight_kg DECIMAL(5,1)`,
-  `ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS has_onboarded BOOLEAN DEFAULT FALSE`,
-]
-
-let migrationDone = false
-async function ensureMigrated() {
-  if (migrationDone) return
-  for (const sql of MIGRATIONS) {
-    try { await query(sql) } catch (err) { console.error('Migration failed:', err.message) }
-  }
-  migrationDone = true
-}
-
 // Get user settings
 router.get('/', verifyToken, async (req, res) => {
   try {
-    await ensureMigrated()
     const userId = req.userId
 
     const result = await query(
@@ -122,7 +102,6 @@ router.post('/', verifyToken, async (req, res) => {
 // Onboarding — calculate goals from body stats and save everything
 router.post('/onboarding', verifyToken, async (req, res) => {
   try {
-    await ensureMigrated()
     const userId = req.userId
     const { gender, age, weightKg, heightCm, activityLevel, goalWeightKg } = req.body
 

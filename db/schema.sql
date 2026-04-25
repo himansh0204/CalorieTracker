@@ -48,5 +48,5 @@ CREATE TABLE IF NOT EXISTS analytics_events (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX idx_meals_user_date ON meals(user_id, logged_at);
-CREATE INDEX idx_analytics_user ON analytics_events(user_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_meals_user_date ON meals(user_id, logged_at);
+CREATE INDEX IF NOT EXISTS idx_analytics_user ON analytics_events(user_id, created_at);

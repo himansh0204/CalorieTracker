@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 
 export function verifyToken(req, res, next) {
-  const token = req.headers.authorization?.split(' ')[1]
+  const token = req.cookies?.authToken
 
   if (!token) {
     console.warn('[auth] Missing token', { path: req.path, ip: req.ip })
@@ -24,6 +24,16 @@ export function generateToken(userId, googleId) {
   return jwt.sign(
     { userId, googleId },
     process.env.JWT_SECRET,
-    { expiresIn: '30d' }
+    { expiresIn: '7d' }
   )
+}
+
+export function cookieOptions() {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: '/',
+  }
 }

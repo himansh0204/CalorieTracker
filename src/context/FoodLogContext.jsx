@@ -19,10 +19,9 @@ export function FoodLogProvider({ children }) {
     if (!user) return
     setLoading(true)
     try {
-      const token = localStorage.getItem('authToken')
       const response = await withTimeout(
         fetch(`${API_BASE}/meals?startDate=${selectedDate}&endDate=${selectedDate}`, {
-          headers: { 'Authorization': `Bearer ${token}` },
+          credentials: 'include',
         }),
         MEAL_SAVE_TIMEOUT_MS
       )
@@ -39,15 +38,12 @@ export function FoodLogProvider({ children }) {
 
   async function logMeal(meal) {
     if (!user) return
-    const token = localStorage.getItem('authToken')
 
     await withTimeout(
       fetch(`${API_BASE}/meals`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           foodName: meal.name,
           calories: meal.calories,
@@ -69,13 +65,10 @@ export function FoodLogProvider({ children }) {
 
   async function updateMeal(mealId, data) {
     if (!user) return
-    const token = localStorage.getItem('authToken')
     const res = await fetch(`${API_BASE}/meals/${mealId}`, {
       method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(data),
     })
     if (!res.ok) {
@@ -87,12 +80,16 @@ export function FoodLogProvider({ children }) {
 
   async function removeMeal(mealId) {
     if (!user) return
-    const token = localStorage.getItem('authToken')
 
-    await fetch(`${API_BASE}/meals/${mealId}`, {
+    const res = await fetch(`${API_BASE}/meals/${mealId}`, {
       method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` },
+      credentials: 'include',
     })
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error(err.error || `Delete failed (${res.status})`)
+    }
 
     setMeals(prev => prev.filter(m => m.id !== mealId))
   }
@@ -102,16 +99,16 @@ export function FoodLogProvider({ children }) {
     setHiddenMealIds(prev => new Set([...prev, mealId]))
 
     pendingDeleteTimers.current[mealId] = setTimeout(async () => {
-      const token = localStorage.getItem('authToken')
       try {
-        await fetch(`${API_BASE}/meals/${mealId}`, {
+        const res = await fetch(`${API_BASE}/meals/${mealId}`, {
           method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${token}` },
+          credentials: 'include',
         })
+        if (!res.ok) throw new Error(`Delete failed (${res.status})`)
+        setMeals(prev => prev.filter(m => m.id !== mealId))
       } catch (err) {
-        console.error('[scheduleRemoveMeal] Delete failed', err)
+        console.error('[scheduleRemoveMeal] Delete failed, restoring meal', err)
       }
-      setMeals(prev => prev.filter(m => m.id !== mealId))
       setHiddenMealIds(prev => {
         const next = new Set(prev)
         next.delete(mealId)

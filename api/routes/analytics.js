@@ -10,6 +10,19 @@ function getGroq() {
   return _groq
 }
 
+// Simple in-process rate limiter: max 30 events per user per minute
+const eventRateLimiter = new Map()
+function checkEventRateLimit(userId) {
+  const now = Date.now()
+  const window = 60_000
+  const limit = 30
+  const timestamps = (eventRateLimiter.get(userId) || []).filter(t => now - t < window)
+  if (timestamps.length >= limit) return false
+  timestamps.push(now)
+  eventRateLimiter.set(userId, timestamps)
+  return true
+}
+
 // Get user analytics summary
 router.get('/summary', verifyToken, async (req, res) => {
   try {
@@ -300,6 +313,11 @@ router.get('/progress', verifyToken, async (req, res) => {
 router.post('/event', verifyToken, async (req, res) => {
   try {
     const userId = req.userId
+
+    if (!checkEventRateLimit(userId)) {
+      return res.status(429).json({ error: 'Too many requests. Please slow down.' })
+    }
+
     const { eventType, eventData } = req.body
 
     if (!eventType) {

@@ -37,10 +37,9 @@ export function useSettings() {
 
     setLoading(true)
     try {
-      const token = localStorage.getItem('authToken')
       const response = await withTimeout(
         fetch(`${API_BASE}/settings`, {
-          headers: { 'Authorization': `Bearer ${token}` },
+          credentials: 'include',
         }),
         SETTINGS_TIMEOUT_MS
       )
@@ -96,14 +95,11 @@ export function useSettings() {
     if (!user) return { ok: true, remote: false }
 
     try {
-      const token = localStorage.getItem('authToken')
       const response = await withTimeout(
         fetch(`${API_BASE}/settings`, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(next),
         }),
         SETTINGS_TIMEOUT_MS

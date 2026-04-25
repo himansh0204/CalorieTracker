@@ -6,14 +6,17 @@
   border-radius: 16px;
   padding: 12px;
   margin-bottom: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-card);
 }
 
 .thumb {
   width: 52px;
   height: 52px;
   border-radius: 13px;
-  border: 1px solid;
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,8 +87,8 @@
 }
 
 .editBtn {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
   border-radius: 8px;
   font-size: 0.9rem;
   cursor: pointer;
@@ -186,7 +189,7 @@
 }
 
 .nameInput {
-  background: var(--bg);
+  background: var(--surface-2);
   border: 1.5px solid var(--border);
   border-radius: 10px;
   padding: 10px 12px;
@@ -216,7 +219,7 @@
 .inputWrap {
   display: flex;
   align-items: center;
-  background: var(--bg);
+  background: var(--surface-2);
   border: 1.5px solid var(--border);
   border-radius: 10px;
   padding: 0 8px 0 10px;

@@ -9,9 +9,8 @@ export function useAnalytics(mealsVersion) {
 
   useEffect(() => {
     if (!user) return
-    const token = localStorage.getItem('authToken')
     fetch(`${API_BASE}/analytics/summary`, {
-      headers: { 'Authorization': `Bearer ${token}` },
+      credentials: 'include',
     })
       .then((r) => r.json())
       .then((res) => {

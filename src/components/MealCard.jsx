@@ -14,24 +14,26 @@ function timeAgo(isoStr) {
   return new Date(isoStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
+const TimeIcons = {
+  morning:   '🍳',
+  afternoon: '🥗',
+  evening:   '🍜',
+  night:     '🍽️',
+}
+
 function getMealStyle(meal) {
-  const type = meal.meal_type || meal.mealType
-  if (type === 'breakfast') return { emoji: '🌅', color: '#f97316' }
-  if (type === 'lunch')     return { emoji: '🍱', color: '#22c55e' }
-  if (type === 'dinner')    return { emoji: '🌙', color: '#6366f1' }
-  if (type === 'snack')     return { emoji: '🍎', color: '#ec4899' }
   const hour = meal.logged_at ? new Date(meal.logged_at).getHours() : 12
-  if (hour >= 5  && hour < 11) return { emoji: '🌅', color: '#f97316' }
-  if (hour >= 11 && hour < 16) return { emoji: '🍱', color: '#22c55e' }
-  if (hour >= 16 && hour < 21) return { emoji: '🌙', color: '#6366f1' }
-  return { emoji: '🍎', color: '#ec4899' }
+  if (hour >= 5  && hour < 12) return 'morning'
+  if (hour >= 12 && hour < 17) return 'afternoon'
+  if (hour >= 17 && hour < 20) return 'evening'
+  return 'night'
 }
 
 export default function MealCard({ meal }) {
   const { updateMeal, scheduleRemoveMeal, undoRemoveMeal } = useFoodLog()
   const { showToast } = useToast()
   const name = meal.food_name || meal.name || 'Meal'
-  const { emoji, color } = getMealStyle(meal)
+  const timeSlot = getMealStyle(meal)
 
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({
@@ -83,11 +85,8 @@ export default function MealCard({ meal }) {
   return (
     <>
       <div className={styles.card}>
-        <div
-          className={styles.thumb}
-          style={{ background: color + '22', borderColor: color + '55' }}
-        >
-          <span className={styles.thumbEmoji}>{emoji}</span>
+        <div className={styles.thumb}>
+          <span className={styles.thumbEmoji}>{TimeIcons[timeSlot]}</span>
         </div>
 
         <div className={styles.info}>

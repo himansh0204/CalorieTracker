@@ -29,10 +29,25 @@ export default function AddMeal() {
     if (!file) return
     const reader = new FileReader()
     reader.onload = (ev) => {
-      setPreview(ev.target.result)
-      analyzeImage(ev.target.result)
+      compressImage(ev.target.result, (compressed) => {
+        setPreview(compressed)
+        analyzeImage(compressed)
+      })
     }
     reader.readAsDataURL(file)
+  }
+
+  function compressImage(dataUrl, callback, maxPx = 1920, quality = 0.85) {
+    const img = new Image()
+    img.onload = () => {
+      const scale = Math.min(1, maxPx / Math.max(img.width, img.height))
+      const canvas = document.createElement('canvas')
+      canvas.width  = Math.round(img.width  * scale)
+      canvas.height = Math.round(img.height * scale)
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+      callback(canvas.toDataURL('image/jpeg', quality))
+    }
+    img.src = dataUrl
   }
 
   async function analyzeImage(imageBase64) {
@@ -40,13 +55,10 @@ export default function AddMeal() {
     setErrorMsg('')
     setHasAI(false)
     try {
-      const token = localStorage.getItem('authToken')
       const res = await fetch(`${API_BASE}/meals/analyze-image`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ imageBase64 }),
       })
       const data = await res.json()

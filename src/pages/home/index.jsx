@@ -22,9 +22,8 @@ export default function Home() {
     setReportState('loading')
     setReportText('')
     try {
-      const token = localStorage.getItem('authToken')
       const res = await fetch(`${API_BASE}/analytics/weekly-report`, {
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
       })
       const data = await res.json()
       if (!res.ok || !data.ok) throw new Error(data.error || 'Failed')

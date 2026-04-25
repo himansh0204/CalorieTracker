@@ -9,15 +9,10 @@ export function useWeekCalories(mealsVersion) {
 
   useEffect(() => {
     if (!user) return
-    const token = localStorage.getItem('authToken')
 
     Promise.all([
-      fetch(`${API_BASE}/analytics/progress?period=week`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }).then(r => r.json()),
-      fetch(`${API_BASE}/analytics/progress?period=last-week`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }).then(r => r.json()),
+      fetch(`${API_BASE}/analytics/progress?period=week`, { credentials: 'include' }).then(r => r.json()),
+      fetch(`${API_BASE}/analytics/progress?period=last-week`, { credentials: 'include' }).then(r => r.json()),
     ])
       .then(([thisWeek, lastWeek]) => {
         const map = new Map()

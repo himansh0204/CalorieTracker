@@ -219,7 +219,8 @@
 .macroCard {
   background: var(--surface);
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-card);
 }
 
 .caloriesCard {
@@ -291,7 +292,7 @@
   position: absolute;
   inset: clamp(8px, 2.5vw, 11px);
   border-radius: 50%;
-  background: var(--surface);
+  background: var(--surface-2);
 }
 
 .ringInner {
@@ -344,7 +345,7 @@
 .macroBarTrack {
   height: 5px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--surface-3);
   overflow: hidden;
 }
 
@@ -364,11 +365,11 @@
 .actionCard {
   text-decoration: none;
   color: inherit;
-  background: linear-gradient(165deg, rgba(22, 28, 39, 0.96) 0%, rgba(16, 21, 30, 0.96) 100%);
+  background: var(--surface);
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid var(--border-soft);
   padding: 10px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-card);
   min-height: 86px;
   display: flex;
   flex-direction: column;

@@ -6,9 +6,8 @@ export function useTotalMeals() {
   const [totalMeals, setTotalMeals] = useState(null)
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken')
     fetch(`${API_BASE}/analytics/summary`, {
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: 'include',
     })
       .then(r => r.json())
       .then(data => setTotalMeals(data.summary?.totalMealsLogged ?? 0))

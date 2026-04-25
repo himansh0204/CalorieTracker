@@ -39,6 +39,8 @@
   gap: 14px;
   padding: clamp(14px, 5vw, 20px) clamp(14px, 5vw, 20px) clamp(12px, 4vw, 16px);
   background: var(--surface);
+  border-bottom: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-card);
   margin-bottom: 8px;
 }
 
@@ -68,6 +70,8 @@
   flex-direction: column;
   gap: 12px;
   background: var(--surface);
+  border-bottom: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-card);
   margin-bottom: 8px;
 }
 
@@ -112,7 +116,7 @@
 .input {
   width: 80px;
   text-align: right;
-  background: var(--bg);
+  background: var(--surface-2);
   border: 1.5px solid var(--border);
   border-radius: 8px;
   padding: 8px 10px;
@@ -229,8 +233,8 @@
 }
 
 .statItem {
-  background: var(--bg);
-  border: 1px solid var(--border);
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
   border-radius: 10px;
   padding: 10px 12px;
   display: flex;

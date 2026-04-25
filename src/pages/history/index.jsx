@@ -11,10 +11,7 @@ import styles from './history.module.css'
 const API_URL = import.meta.env.VITE_API_URL || '/api'
 
 async function apiFetch(path) {
-  const token = localStorage.getItem('authToken')
-  const res = await fetch(`${API_URL}${path}`, {
-    headers: { 'Authorization': `Bearer ${token}` },
-  })
+  const res = await fetch(`${API_URL}${path}`, { credentials: 'include' })
   if (!res.ok) throw new Error('API error')
   return res.json()
 }

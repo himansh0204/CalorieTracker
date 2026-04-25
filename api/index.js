@@ -1,6 +1,8 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+import helmet from 'helmet'
+import cookieParser from 'cookie-parser'
 
 import authRoutes from './routes/auth.js'
 import mealsRoutes from './routes/meals.js'
@@ -10,6 +12,8 @@ import analyticsRoutes from './routes/analytics.js'
 const app = express()
 
 // Middleware
+app.use(helmet())
+app.use(cookieParser())
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true)
@@ -21,7 +25,7 @@ app.use(cors({
   credentials: true,
 }))
 
-app.use(express.json({ limit: '10mb' }))
+app.use(express.json({ limit: '15mb' }))
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -69,20 +69,32 @@ router.post('/', verifyToken, async (req, res) => {
     const userId = req.userId
     const { calorieGoal, proteinGoal, carbsGoal, fatGoal } = req.body
 
+    const toInt = (v, min, max) => {
+      const n = Math.round(Number(v))
+      return Number.isFinite(n) && n >= min && n <= max ? n : null
+    }
+    const cal = toInt(calorieGoal, 500, 10000)
+    const pro = toInt(proteinGoal, 10, 500)
+    const carb = toInt(carbsGoal, 10, 1000)
+    const fat = toInt(fatGoal, 10, 500)
+    if (cal === null || pro === null || carb === null || fat === null) {
+      return res.status(400).json({ error: 'Goals must be positive numbers within reasonable ranges' })
+    }
+
     const existRes = await query('SELECT id FROM user_settings WHERE user_id = $1', [userId])
 
     if (existRes.rows.length === 0) {
       await query(
         `INSERT INTO user_settings (user_id, calorie_goal, protein_goal, carbs_goal, fat_goal, updated_at)
          VALUES ($1, $2, $3, $4, $5, NOW())`,
-        [userId, calorieGoal || DEFAULTS.calorieGoal, proteinGoal || DEFAULTS.proteinGoal, carbsGoal || DEFAULTS.carbsGoal, fatGoal || DEFAULTS.fatGoal]
+        [userId, cal, pro, carb, fat]
       )
     } else {
       await query(
         `UPDATE user_settings
          SET calorie_goal = $2, protein_goal = $3, carbs_goal = $4, fat_goal = $5, updated_at = NOW()
          WHERE user_id = $1`,
-        [userId, calorieGoal || DEFAULTS.calorieGoal, proteinGoal || DEFAULTS.proteinGoal, carbsGoal || DEFAULTS.carbsGoal, fatGoal || DEFAULTS.fatGoal]
+        [userId, cal, pro, carb, fat]
       )
     }
 

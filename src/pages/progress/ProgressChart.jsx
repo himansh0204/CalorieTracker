@@ -3,7 +3,7 @@ import styles from './progress.module.css'
 const FAT_COLOR     = '#f59e0b'
 const CARBS_COLOR   = '#8b5cf6'
 const PROTEIN_COLOR = '#22c55e'
-const CHART_H = 160
+const CHART_H = 90
 const GRID_COUNT = 4
 
 function calcCeiling(days) {

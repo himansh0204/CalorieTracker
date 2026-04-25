@@ -73,13 +73,10 @@ export default function Onboarding({ onComplete, onCancel, mode = 'setup' }) {
     setSubmitting(true)
     setError(null)
     try {
-      const token = localStorage.getItem('authToken')
       const res = await fetch(`${API_BASE}/settings/onboarding`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           gender: form.gender,
           age: parseInt(form.age),

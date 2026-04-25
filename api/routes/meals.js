@@ -10,6 +10,19 @@ function getGroq() {
   return _groq
 }
 
+// Rate limiter for image analysis: max 10 requests per user per minute
+const imageAnalysisLimiter = new Map()
+function checkImageRateLimit(userId) {
+  const now = Date.now()
+  const window = 60_000
+  const limit = 10
+  const timestamps = (imageAnalysisLimiter.get(userId) || []).filter(t => now - t < window)
+  if (timestamps.length >= limit) return false
+  timestamps.push(now)
+  imageAnalysisLimiter.set(userId, timestamps)
+  return true
+}
+
 // Log a meal
 router.post('/', verifyToken, async (req, res) => {
   try {
@@ -64,7 +77,7 @@ router.get('/', verifyToken, async (req, res) => {
       params.push(endDate)
     }
 
-    sql += ' ORDER BY logged_at DESC'
+    sql += ` ORDER BY logged_at DESC LIMIT 200`
 
     const result = await query(sql, params)
 
@@ -83,6 +96,10 @@ router.put('/:mealId', verifyToken, async (req, res) => {
   try {
     const userId = req.userId
     const { mealId } = req.params
+
+    if (!/^\d+$/.test(mealId)) {
+      return res.status(400).json({ error: 'Invalid meal ID' })
+    }
     const { foodName, calories, protein, carbs, fat } = req.body
 
     if (!foodName || typeof foodName !== 'string' || !foodName.trim()) {
@@ -117,6 +134,10 @@ router.delete('/:mealId', verifyToken, async (req, res) => {
     const userId = req.userId
     const { mealId } = req.params
 
+    if (!/^\d+$/.test(mealId)) {
+      return res.status(400).json({ error: 'Invalid meal ID' })
+    }
+
     const result = await query(
       'DELETE FROM meals WHERE id = $1 AND user_id = $2 RETURNING id',
       [mealId, userId]
@@ -142,9 +163,23 @@ router.delete('/:mealId', verifyToken, async (req, res) => {
 // Analyze a meal photo with Groq Vision
 router.post('/analyze-image', verifyToken, async (req, res) => {
   try {
+    if (!checkImageRateLimit(req.userId)) {
+      return res.status(429).json({ error: 'Too many requests. Please wait before analyzing another image.' })
+    }
+
     const { imageBase64 } = req.body
     if (!imageBase64) {
       return res.status(400).json({ error: 'imageBase64 is required' })
+    }
+
+    // ~10MB limit: base64 encodes 3 bytes → 4 chars, so 10MB ≈ 13.6M chars
+    // Frontend compresses to ~1-2MB so this is a safety net only
+    if (typeof imageBase64 !== 'string' || imageBase64.length > 14_000_000) {
+      return res.status(413).json({ error: 'Image too large. Maximum size is 10MB.' })
+    }
+
+    if (!imageBase64.startsWith('data:image/')) {
+      return res.status(400).json({ error: 'Invalid image format' })
     }
 
     const response = await getGroq().chat.completions.create({

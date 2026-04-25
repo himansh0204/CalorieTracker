@@ -188,8 +188,9 @@ router.post('/analyze-image', verifyToken, async (req, res) => {
             },
             {
               type: 'text',
-              text: `Analyze this meal photo and estimate the nutritional content for what is visible.
-Respond ONLY with a valid JSON object in this exact format (no markdown, no explanation):
+              text: `Look at this image. If it does not contain food or a meal, respond with exactly: {"error":"no_food"}
+
+If it does contain food, respond ONLY with a valid JSON object in this exact format (no markdown, no explanation):
 {
   "foodName": "descriptive meal name",
   "description": "brief 1-sentence description",
@@ -220,6 +221,10 @@ Use realistic estimates based on typical portion sizes. All nutrient values must
         return res.status(502).json({ error: 'Could not parse AI response' })
       }
       parsed = JSON.parse(jsonMatch[0])
+    }
+
+    if (parsed.error === 'no_food') {
+      return res.status(422).json({ error: 'No food detected. Please take a photo of a meal.' })
     }
 
     res.json({

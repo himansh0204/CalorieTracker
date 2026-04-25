@@ -1,3 +1,4 @@
+import { localDateStr, localYesterdayStr } from '../../utils/dates'
 import styles from './history.module.css'
 
 function getMealStyle(meal) {
@@ -81,8 +82,8 @@ export default function HistoryDayRow({ date, meals, isOpen, onToggle }) {
 }
 
 function formatDay(str) {
-  const today = new Date().toISOString().slice(0, 10)
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+  const today = localDateStr()
+  const yesterday = localYesterdayStr()
   if (str === today) return 'Today'
   if (str === yesterday) return 'Yesterday'
   return new Date(str).toLocaleDateString('en-US', { weekday: 'short' })

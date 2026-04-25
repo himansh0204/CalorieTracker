@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { localDateStr, localYesterdayStr } from '../../utils/dates'
 import MealCard from '../../components/MealCard'
 import EmptyMealState from '../../components/EmptyMealState'
 import { SkeletonMealCard } from '../../components/Skeleton'
@@ -20,7 +21,7 @@ export default function MealList({ meals, loading, selectedDate }) {
           </>
         )}
         {!loading && meals.length === 0 && (
-          selectedDate === new Date().toISOString().slice(0, 10)
+          selectedDate === localDateStr()
             ? <div className={styles.emptyWrap}><EmptyMealState /></div>
             : <p className={styles.empty}>No meals logged</p>
         )}
@@ -33,8 +34,8 @@ export default function MealList({ meals, loading, selectedDate }) {
 }
 
 function activityTitle(str) {
-  const today = new Date().toISOString().slice(0, 10)
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+  const today = localDateStr()
+  const yesterday = localYesterdayStr()
   if (str === today) return "Today's Activity"
   if (str === yesterday) return "Yesterday's Activity"
   return new Date(str).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })

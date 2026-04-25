@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react'
 import { useWeekCalories } from './useWeekCalories'
+import { localDateStr } from '../../utils/dates'
 import styles from './home.module.css'
 
 const NUM_WEEKS = 2
@@ -13,7 +14,7 @@ function getMondayMs(dateStr) {
 }
 
 function weekPageOf(dateStr) {
-  const todayStr = new Date().toISOString().slice(0, 10)
+  const todayStr = localDateStr()
   const currentMondayMs = getMondayMs(todayStr)
   const targetMondayMs = getMondayMs(dateStr)
   const weekDiff = Math.round((currentMondayMs - targetMondayMs) / (7 * 86400000))
@@ -22,7 +23,7 @@ function weekPageOf(dateStr) {
 
 export default function WeekStrip({ calorieGoal, mealsVersion, selectedDate, setSelectedDate }) {
   const calMap = useWeekCalories(mealsVersion)
-  const todayStr = new Date().toISOString().slice(0, 10)
+  const todayStr = localDateStr()
   const stripRef = useRef(null)
   const mountedRef = useRef(false)
 

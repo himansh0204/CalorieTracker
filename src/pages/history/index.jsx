@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
+import { localDateStr } from '../../utils/dates'
 import { useAuth } from '../../context/AuthContext'
 import { useFoodLog } from '../../context/FoodLogContext'
 import PageHeader from '../../components/PageHeader'
 import EmptyMealState from '../../components/EmptyMealState'
 import { SkeletonHistoryRow } from '../../components/Skeleton'
-import { useTotalMeals } from '../../hooks/useTotalMeals'
+
 import { IconHistory } from '../../components/icons'
 import HistoryDayRow from './HistoryDayRow'
 import styles from './history.module.css'
@@ -19,8 +20,8 @@ async function apiFetch(path) {
 
 export default function History() {
   const { user } = useAuth()
-  const { mealsVersion } = useFoodLog()
-  const totalMeals = useTotalMeals()
+  const { mealsVersion, hiddenMealIds } = useFoodLog()
+
   const [dates, setDates] = useState([])
   const [expanded, setExpanded] = useState(null)
   const [mealsCache, setMealsCache] = useState({})
@@ -28,16 +29,17 @@ export default function History() {
 
   useEffect(() => {
     if (!user) return
-    const end = new Date().toISOString().slice(0, 10)
-    const start = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    const end = localDateStr()
+    const d = new Date(); d.setDate(d.getDate() - 30)
+    const start = localDateStr(d)
     apiFetch(`/meals?startDate=${start}&endDate=${end}`)
       .then((data) => {
-        const uniqueDates = [...new Set((data.meals || []).map((m) => m.logged_at.slice(0, 10)))]
+        const uniqueDates = [...new Set((data.meals || []).map((m) => localDateStr(new Date(m.logged_at))))]
           .sort((a, b) => b.localeCompare(a))
         setDates(uniqueDates)
         const grouped = {}
         for (const meal of data.meals || []) {
-          const d = meal.logged_at.slice(0, 10)
+          const d = localDateStr(new Date(meal.logged_at))
           if (!grouped[d]) grouped[d] = []
           grouped[d].push(meal)
         }
@@ -55,6 +57,13 @@ export default function History() {
     }
   }
 
+  const visibleDates = dates
+    .map((date) => ({
+      date,
+      meals: (mealsCache[date] || []).filter((m) => !hiddenMealIds.has(m.id)),
+    }))
+    .filter(({ meals }) => meals.length > 0)
+
   return (
     <div className={styles.page}>
       <PageHeader title="History" icon={IconHistory} />
@@ -69,19 +78,19 @@ export default function History() {
         </ul>
       )}
 
-      {!loading && totalMeals === 0 && (
+      {!loading && visibleDates.length === 0 && (
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '16px' }}>
           <EmptyMealState />
         </div>
       )}
 
-      {!loading && dates.length > 0 && (
+      {!loading && visibleDates.length > 0 && (
         <ul className={styles.list}>
-          {dates.map((date) => (
+          {visibleDates.map(({ date, meals }) => (
             <HistoryDayRow
               key={date}
               date={date}
-              meals={mealsCache[date]}
+              meals={meals}
               isOpen={expanded === date}
               onToggle={() => toggle(date)}
             />

@@ -76,4 +76,19 @@ router.post('/logout', (_req, res) => {
   res.json({ ok: true })
 })
 
+router.delete('/account', verifyToken, async (req, res) => {
+  try {
+    const userId = req.userId
+    await query('DELETE FROM analytics_events WHERE user_id = $1', [userId])
+    await query('DELETE FROM meals WHERE user_id = $1', [userId])
+    await query('DELETE FROM user_settings WHERE user_id = $1', [userId])
+    await query('DELETE FROM users WHERE id = $1', [userId])
+    res.clearCookie('authToken', { ...cookieOptions(), maxAge: 0 })
+    res.json({ ok: true })
+  } catch (error) {
+    console.error('Delete account error:', error)
+    res.status(500).json({ error: 'Failed to delete account' })
+  }
+})
+
 export default router

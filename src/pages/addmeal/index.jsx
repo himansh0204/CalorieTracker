@@ -22,7 +22,6 @@ export default function AddMeal() {
   const [saving, setSaving] = useState(false)
   const [nutrients, setNutrients] = useState({ calories: '', protein: '', carbs: '', fat: '' })
   const [hasAI, setHasAI] = useState(false)
-  const [errorMsg, setErrorMsg] = useState('')
 
   function handleFileChange(e) {
     const file = e.target.files?.[0]
@@ -52,7 +51,6 @@ export default function AddMeal() {
 
   async function analyzeImage(imageBase64) {
     setAnalyzing(true)
-    setErrorMsg('')
     setHasAI(false)
     try {
       const res = await fetch(`${API_BASE}/meals/analyze-image`, {
@@ -66,8 +64,9 @@ export default function AddMeal() {
       setMealName(data.foodName || '')
       setNutrients({ calories: data.calories, protein: data.protein, carbs: data.carbs, fat: data.fat })
       setHasAI(true)
+      showToast('AI estimates filled in — adjust if needed')
     } catch (err) {
-      setErrorMsg(err.message || 'Could not analyze image')
+      showToast(err.message || 'Could not analyze image', { type: 'error' })
     } finally {
       setAnalyzing(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -133,18 +132,6 @@ export default function AddMeal() {
           </div>
         </label>
 
-        {errorMsg ? (
-          <div className={styles.aiErrorWrap}>
-            <p className={styles.aiError}>⚠️ {errorMsg}</p>
-            {preview && (
-              <button className={styles.retryAnalysis} onClick={() => analyzeImage(preview)}>
-                Retry analysis
-              </button>
-            )}
-          </div>
-        ) : hasAI ? (
-          <p className={styles.aiSuccess}>✓ AI estimates filled in — adjust if needed</p>
-        ) : null}
 
         <div className={styles.addSection}>
           <div className={styles.formGroup}>
@@ -160,21 +147,24 @@ export default function AddMeal() {
 
           <div className={styles.formGroup}>
             <label className={styles.label}>Meal</label>
-            <select
-              className={styles.select}
-              value={mealType}
-              onChange={(e) => setMealType(e.target.value)}
-            >
+            <div className={styles.mealTypeRow}>
               {MEAL_TYPES.map((t) => (
-                <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                <button
+                  key={t}
+                  className={`${styles.mealTypePill} ${mealType === t ? styles.mealTypePillActive : ''}`}
+                  onClick={() => setMealType(t)}
+                >
+                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                </button>
               ))}
-            </select>
+            </div>
           </div>
 
+          <p className={styles.editHint}>
+            {hasAI ? 'AI estimates — tap to adjust' : 'Enter nutrition values'}
+          </p>
+
           <div className={styles.editNutrients}>
-            <p className={styles.editHint}>
-              {hasAI ? 'AI estimates — tap to adjust' : 'Enter nutrition values'}
-            </p>
             <div className={styles.editGrid}>
               {[
                 { key: 'calories', label: 'Calories', unit: 'kcal' },

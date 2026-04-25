@@ -13,6 +13,7 @@ export function FoodLogProvider({ children }) {
 
   // Pending-delete: meals hidden from view for 4s (undo window)
   const [hiddenMealIds, setHiddenMealIds] = useState(() => new Set())
+  const [mealsVersion, setMealsVersion] = useState(0)
   const pendingDeleteTimers = useRef({})
 
   const fetchMeals = useCallback(async () => {
@@ -39,7 +40,7 @@ export function FoodLogProvider({ children }) {
   async function logMeal(meal) {
     if (!user) return
 
-    await withTimeout(
+    const data = await withTimeout(
       fetch(`${API_BASE}/meals`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -60,7 +61,21 @@ export function FoodLogProvider({ children }) {
       MEAL_SAVE_TIMEOUT_MS
     )
 
-    await withTimeout(fetchMeals(), MEAL_SAVE_TIMEOUT_MS)
+    // Optimistic update — add to local state immediately so home updates instantly
+    const optimisticMeal = {
+      id: data.mealId,
+      user_id: user.id,
+      food_name: meal.name,
+      calories: meal.calories,
+      protein: meal.protein,
+      carbs: meal.carbs,
+      fat: meal.fat,
+      serving_size: meal.servingSize || '1 serving',
+      food_id: meal.foodId || null,
+      logged_at: data.loggedAt,
+    }
+    setMeals(prev => [optimisticMeal, ...prev])
+    setMealsVersion(v => v + 1)
   }
 
   async function updateMeal(mealId, data) {
@@ -76,6 +91,7 @@ export function FoodLogProvider({ children }) {
       throw new Error(err.error || `Update failed (${res.status})`)
     }
     await fetchMeals()
+    setMealsVersion(v => v + 1)
   }
 
   async function removeMeal(mealId) {
@@ -92,6 +108,7 @@ export function FoodLogProvider({ children }) {
     }
 
     setMeals(prev => prev.filter(m => m.id !== mealId))
+    setMealsVersion(v => v + 1)
   }
 
   // Hides a meal immediately, then permanently deletes after 4s (undo window)
@@ -106,6 +123,7 @@ export function FoodLogProvider({ children }) {
         })
         if (!res.ok) throw new Error(`Delete failed (${res.status})`)
         setMeals(prev => prev.filter(m => m.id !== mealId))
+        setMealsVersion(v => v + 1)
       } catch (err) {
         console.error('[scheduleRemoveMeal] Delete failed, restoring meal', err)
       }
@@ -151,6 +169,7 @@ export function FoodLogProvider({ children }) {
         loading,
         selectedDate,
         setSelectedDate,
+        mealsVersion,
         logMeal,
         updateMeal,
         removeMeal,

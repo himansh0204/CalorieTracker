@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import { useFoodLog } from '../../context/FoodLogContext'
 import PageHeader from '../../components/PageHeader'
 import EmptyMealState from '../../components/EmptyMealState'
 import { SkeletonHistoryRow } from '../../components/Skeleton'
@@ -18,6 +19,7 @@ async function apiFetch(path) {
 
 export default function History() {
   const { user } = useAuth()
+  const { mealsVersion } = useFoodLog()
   const totalMeals = useTotalMeals()
   const [dates, setDates] = useState([])
   const [expanded, setExpanded] = useState(null)
@@ -42,7 +44,7 @@ export default function History() {
         setMealsCache(grouped)
       })
       .finally(() => setLoading(false))
-  }, [user])
+  }, [user, mealsVersion])
 
   async function toggle(date) {
     if (expanded === date) { setExpanded(null); return }

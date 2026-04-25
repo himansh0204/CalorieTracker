@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useFoodLog } from '../context/FoodLogContext'
+import PageHeader from '../components/PageHeader'
+import { IconAdd } from '../components/icons'
 import styles from './Scanner.module.css'
 
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack']
@@ -80,10 +82,7 @@ export default function Scanner() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <button className={styles.back} onClick={() => navigate(-1)}>‹</button>
-        <h1 className={styles.title}>Add Meal</h1>
-      </header>
+      <PageHeader title="Add Meal" icon={IconAdd} showBack />
 
       <input
         ref={fileInputRef}

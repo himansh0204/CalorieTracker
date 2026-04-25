@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import PageHeader from '../components/PageHeader'
+import EmptyMealState from '../components/EmptyMealState'
+import { useTotalMeals } from '../hooks/useTotalMeals'
+import { IconHistory } from '../components/icons'
 import styles from './History.module.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '/api'
@@ -15,6 +19,7 @@ async function apiFetch(path) {
 
 export default function History() {
   const { user } = useAuth()
+  const totalMeals = useTotalMeals()
   const [dates, setDates] = useState([])
   const [expanded, setExpanded] = useState(null)
   const [mealsCache, setMealsCache] = useState({})
@@ -65,14 +70,13 @@ export default function History() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <h1 className={styles.title}>History</h1>
-        <span className={styles.sub}>Last 30 days</span>
-      </header>
+      <PageHeader title="History" icon={IconHistory} />
 
       {loading && <p className={styles.empty}>Loading…</p>}
-      {!loading && dates.length === 0 && (
-        <p className={styles.empty}>No history yet. Start logging meals!</p>
+      {!loading && totalMeals === 0 && (
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '16px' }}>
+          <EmptyMealState />
+        </div>
       )}
 
       <ul className={styles.list}>

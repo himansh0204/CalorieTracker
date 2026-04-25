@@ -51,6 +51,11 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Fluid images */
+img {
+  max-width: 100%;
+}
+
 /* ---- Utility ---- */
 .loading-screen {
   height: 100dvh;

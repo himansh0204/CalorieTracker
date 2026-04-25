@@ -1,0 +1,56 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: clamp(10px, 4vw, 16px) clamp(12px, 4vw, 16px) clamp(8px, 3vw, 12px);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: none;
+  background: var(--surface-2, rgba(255,255,255,0.06));
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.backBtn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: clamp(1rem, 4vw, 1.15rem);
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  flex: 1;
+}
+
+.spacer {
+  width: 34px;
+  flex-shrink: 0;
+}
+

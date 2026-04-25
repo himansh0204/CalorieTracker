@@ -4,7 +4,7 @@
   flex-direction: column;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 24px;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
 }
 
 .header {
@@ -23,7 +23,7 @@
 .periodRow {
   display: flex;
   gap: 6px;
-  padding: 0 14px 14px;
+  padding: 12px 14px 14px;
   overflow-x: auto;
   flex-shrink: 0;
   -webkit-overflow-scrolling: touch;
@@ -102,7 +102,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 0 14px;
+  padding: 0 clamp(8px, 3.5vw, 14px);
 }
 
 /* Total kcal row */
@@ -119,7 +119,7 @@
 }
 
 .totalKcal {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 6vw, 2rem);
   font-weight: 800;
   color: var(--text);
   line-height: 1;
@@ -157,7 +157,7 @@
 }
 
 .yLabel {
-  font-size: 0.62rem;
+  font-size: clamp(0.54rem, 1.8vw, 0.62rem);
   font-weight: 600;
   color: var(--text-muted);
   line-height: 1;
@@ -239,7 +239,7 @@
 .xLabel {
   flex: 1;
   text-align: center;
-  font-size: 0.72rem;
+  font-size: clamp(0.6rem, 2vw, 0.72rem);
   font-weight: 700;
   color: var(--text-muted);
   line-height: 1;
@@ -319,4 +319,23 @@
   font-size: 0.9rem;
   padding: 24px 0;
   margin: 0;
+}
+
+/* breakdown row condenses on narrow screens */
+@media (max-width: 380px) {
+  .breakdownRow {
+    padding: 8px 10px;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .breakdownMacros {
+    gap: clamp(4px, 1.5vw, 8px);
+    font-size: clamp(0.65rem, 2vw, 0.75rem);
+  }
+
+  .breakdownCal {
+    min-width: 46px;
+    font-size: clamp(0.7rem, 2.2vw, 0.8rem);
+  }
 }

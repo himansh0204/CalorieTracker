@@ -12,9 +12,8 @@
 
 .main {
   flex: 1;
-  overflow-y: auto;
+  overflow: hidden;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 92px;
 }
 
 .nav {
@@ -64,4 +63,14 @@
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.02em;
+}
+
+@media (max-width: 360px) {
+  .navLabel {
+    font-size: 0.58rem;
+  }
+
+  .navItem {
+    padding: 6px 2px;
+  }
 }

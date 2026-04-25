@@ -4,6 +4,7 @@ import { useSettings } from '../hooks/useSettings'
 import { useAuth } from '../context/AuthContext'
 import { Link } from 'react-router-dom'
 import MealCard from '../components/MealCard'
+import EmptyMealState from '../components/EmptyMealState'
 import styles from './Dashboard.module.css'
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api'
@@ -268,10 +269,10 @@ export default function Dashboard() {
         </div>
         <div className={styles.mealScroll}>
           {loading && <p className={styles.empty}>Loading…</p>}
-          {!loading && meals.length === 0 && (
-            <p className={styles.empty}>No meals logged yet. Tap + to add one.</p>
+          {!loading && meals.length === 0 && <EmptyMealState />}
+          {meals.length > 0 && (
+            <div>{meals.map((m) => <MealCard key={m.id} meal={m} />)}</div>
           )}
-          {meals.map((m) => <MealCard key={m.id} meal={m} />)}
         </div>
       </section>
     </div>

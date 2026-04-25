@@ -1,6 +1,8 @@
 import { useState, Suspense, lazy } from 'react'
 import { useSettings } from '../hooks/useSettings'
 import { useAuth } from '../context/AuthContext'
+import PageHeader from '../components/PageHeader'
+import { IconSettings } from '../components/icons'
 import styles from './Settings.module.css'
 
 const Onboarding = lazy(() => import('./Onboarding'))
@@ -15,17 +17,14 @@ const ACTIVITY_LABELS = {
 
 export default function Settings() {
   const { user, logout } = useAuth()
-  const { settings, loading, refetch } = useSettings()
+  const { settings, refetch } = useSettings()
   const [showBodyStats, setShowBodyStats] = useState(false)
 
   const hasStats = settings.weightKg && settings.heightCm && settings.age
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <h1 className={styles.title}>Settings</h1>
-        {loading && <span className={styles.syncing}>Syncing…</span>}
-      </header>
+      <PageHeader title="Settings" icon={IconSettings} />
 
       <div className={styles.profile}>
         <img

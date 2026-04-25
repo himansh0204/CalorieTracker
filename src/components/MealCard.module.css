@@ -1,10 +1,10 @@
 .card {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: clamp(8px, 2.5vw, 10px);
   background: linear-gradient(160deg, rgba(20, 26, 37, 0.96) 0%, rgba(15, 20, 30, 0.96) 100%);
   border-radius: 14px;
-  padding: 12px 12px;
+  padding: clamp(9px, 3vw, 12px);
   margin-bottom: 8px;
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.34);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -66,3 +66,4 @@
   opacity: 1;
   color: #ef4444;
 }
+

@@ -2,25 +2,13 @@ import express from 'express'
 import Groq from 'groq-sdk'
 import { query } from '../lib/db.js'
 import { verifyToken } from '../middleware/auth.js'
+import { checkLimit, analyticsEventLimiter, weeklyReportLimiter } from '../lib/ratelimit.js'
 
 const router = express.Router()
 let _groq = null
 function getGroq() {
   if (!_groq) _groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
   return _groq
-}
-
-// Simple in-process rate limiter: max 30 events per user per minute
-const eventRateLimiter = new Map()
-function checkEventRateLimit(userId) {
-  const now = Date.now()
-  const window = 60_000
-  const limit = 30
-  const timestamps = (eventRateLimiter.get(userId) || []).filter(t => now - t < window)
-  if (timestamps.length >= limit) return false
-  timestamps.push(now)
-  eventRateLimiter.set(userId, timestamps)
-  return true
 }
 
 // Get user analytics summary
@@ -129,6 +117,10 @@ router.get('/summary', verifyToken, async (req, res) => {
 router.get('/weekly-report', verifyToken, async (req, res) => {
   try {
     const userId = req.userId
+
+    if (!await checkLimit(weeklyReportLimiter, String(userId))) {
+      return res.status(429).json({ error: 'Too many requests. Please wait before generating another report.' })
+    }
 
     // Last 7 days per-day totals + meal names
     const weekRes = await query(
@@ -314,7 +306,7 @@ router.post('/event', verifyToken, async (req, res) => {
   try {
     const userId = req.userId
 
-    if (!checkEventRateLimit(userId)) {
+    if (!await checkLimit(analyticsEventLimiter, String(userId))) {
       return res.status(429).json({ error: 'Too many requests. Please slow down.' })
     }
 

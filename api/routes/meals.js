@@ -2,6 +2,7 @@ import express from 'express'
 import Groq from 'groq-sdk'
 import { query } from '../lib/db.js'
 import { verifyToken } from '../middleware/auth.js'
+import { checkLimit, imageAnalysisLimiter, mealLogLimiter } from '../lib/ratelimit.js'
 
 const router = express.Router()
 let _groq = null
@@ -10,24 +11,16 @@ function getGroq() {
   return _groq
 }
 
-// Rate limiter for image analysis: max 10 requests per user per minute
-const imageAnalysisLimiter = new Map()
-function checkImageRateLimit(userId) {
-  const now = Date.now()
-  const window = 60_000
-  const limit = 10
-  const timestamps = (imageAnalysisLimiter.get(userId) || []).filter(t => now - t < window)
-  if (timestamps.length >= limit) return false
-  timestamps.push(now)
-  imageAnalysisLimiter.set(userId, timestamps)
-  return true
-}
-
 // Log a meal
 router.post('/', verifyToken, async (req, res) => {
   try {
-    const { foodName, calories, protein, carbs, fat, servingSize, foodId } = req.body
     const userId = req.userId
+
+    if (!await checkLimit(mealLogLimiter, String(userId))) {
+      return res.status(429).json({ error: 'Too many requests. Please slow down.' })
+    }
+
+    const { foodName, calories, protein, carbs, fat, servingSize, foodId } = req.body
 
     if (!foodName || calories === undefined) {
       return res.status(400).json({ error: 'foodName and calories required' })
@@ -163,7 +156,7 @@ router.delete('/:mealId', verifyToken, async (req, res) => {
 // Analyze a meal photo with Groq Vision
 router.post('/analyze-image', verifyToken, async (req, res) => {
   try {
-    if (!checkImageRateLimit(req.userId)) {
+    if (!await checkLimit(imageAnalysisLimiter, String(req.userId))) {
       return res.status(429).json({ error: 'Too many requests. Please wait before analyzing another image.' })
     }
 

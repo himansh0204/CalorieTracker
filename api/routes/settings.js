@@ -105,6 +105,25 @@ router.post('/onboarding', verifyToken, async (req, res) => {
     const userId = req.userId
     const { gender, age, weightKg, heightCm, activityLevel, goalWeightKg } = req.body
 
+    const VALID_GENDERS = ['male', 'female']
+    const VALID_ACTIVITY = ['sedentary', 'light', 'moderate', 'active', 'very_active']
+
+    if (!VALID_GENDERS.includes(gender)) {
+      return res.status(400).json({ error: 'gender must be male or female' })
+    }
+    if (!age || isNaN(Number(age)) || Number(age) < 10 || Number(age) > 120) {
+      return res.status(400).json({ error: 'age must be a number between 10 and 120' })
+    }
+    if (!weightKg || isNaN(Number(weightKg)) || Number(weightKg) <= 0) {
+      return res.status(400).json({ error: 'weightKg must be a positive number' })
+    }
+    if (!heightCm || isNaN(Number(heightCm)) || Number(heightCm) <= 0) {
+      return res.status(400).json({ error: 'heightCm must be a positive number' })
+    }
+    if (!VALID_ACTIVITY.includes(activityLevel)) {
+      return res.status(400).json({ error: `activityLevel must be one of: ${VALID_ACTIVITY.join(', ')}` })
+    }
+
     // Mifflin-St Jeor BMR
     const bmr =
       gender === 'male'

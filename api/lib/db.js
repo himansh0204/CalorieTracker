@@ -7,15 +7,20 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 })
 
+pool.on('error', (err) => {
+  console.error('[db] Unexpected pool error', err)
+})
+
 export async function query(text, params) {
   const start = Date.now()
   try {
     const result = await pool.query(text, params)
-    const duration = Date.now() - start
-    console.log('Executed query', { text, duration, rows: result.rowCount })
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[db]', { duration: Date.now() - start, rows: result.rowCount, text })
+    }
     return result
   } catch (error) {
-    console.error('Database error', { text, error })
+    console.error('[db] Query error', { error: error.message, text })
     throw error
   }
 }

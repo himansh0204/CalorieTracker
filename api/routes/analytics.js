@@ -45,13 +45,13 @@ router.get('/summary', verifyToken, async (req, res) => {
       [userId]
     )
 
-    // Goal adherence (last 7 days)
+    // Goal adherence (last 14 days — covers current + previous week in strip)
     const adherenceRes = await query(
       `SELECT
         DATE(logged_at) as date,
         COALESCE(SUM(calories), 0) as calories
        FROM meals
-       WHERE user_id = $1 AND logged_at >= NOW() - INTERVAL '7 days'
+       WHERE user_id = $1 AND logged_at >= NOW() - INTERVAL '14 days'
        GROUP BY DATE(logged_at)
        ORDER BY DATE(logged_at) DESC`,
       [userId]
@@ -103,7 +103,7 @@ router.get('/summary', verifyToken, async (req, res) => {
           carbs: Math.round(todayRes.rows[0].carbs),
           fat: Math.round(todayRes.rows[0].fat),
         },
-        last7Days: adherenceRes.rows,
+        last14Days: adherenceRes.rows,
       },
     })
   } catch (error) {
@@ -205,6 +205,11 @@ router.get('/progress', verifyToken, async (req, res) => {
   try {
     const userId = req.userId
     const period = req.query.period || 'week'
+
+    const VALID_PERIODS = ['week', 'last-week', '2weeks', 'month']
+    if (!VALID_PERIODS.includes(period)) {
+      return res.status(400).json({ error: `period must be one of: ${VALID_PERIODS.join(', ')}` })
+    }
 
     const today = new Date()
     today.setHours(0, 0, 0, 0)

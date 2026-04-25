@@ -8,28 +8,6 @@
   padding-bottom: calc(80px + env(safe-area-inset-bottom));
 }
 
-.header {
-  padding: 20px 20px 12px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: flex-end;
-  gap: 10px;
-}
-
-.title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--text);
-  margin: 0;
-}
-
-.sub {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-bottom: 2px;
-}
-
 .empty {
   text-align: center;
   color: var(--text-muted);
@@ -48,11 +26,12 @@
 
 .item {
   background: var(--surface);
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* ── Day header row ── */
 .dayRow {
   display: flex;
   align-items: center;
@@ -83,10 +62,23 @@
   color: var(--text-muted);
 }
 
+.dayRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
 .calTotal {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: var(--primary);
+}
+
+.mealCount {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
 .chevron {
@@ -94,15 +86,17 @@
   color: var(--text-muted);
   transition: transform 0.2s;
   display: inline-block;
+  flex-shrink: 0;
 }
 
 .chevron.open {
   transform: rotate(90deg);
 }
 
+/* ── Expanded detail ── */
 .detail {
-  padding: 0 16px 14px;
-  border-top: 1px solid var(--bg);
+  padding: 0 12px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -110,32 +104,78 @@
 
 .macroSummary {
   display: flex;
-  gap: clamp(8px, 3vw, 16px);
-  font-size: 0.75rem;
+  gap: clamp(6px, 2.5vw, 14px);
+  font-size: 0.73rem;
   color: var(--text-muted);
-  padding: 10px 0 4px;
+  padding: 10px 4px 6px;
   flex-wrap: wrap;
+  font-weight: 600;
 }
 
+/* ── Individual meal row ── */
 .mealRow {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 10px;
+  padding: 7px 4px;
+  border-radius: 12px;
+}
+
+.mealThumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mealThumbEmoji {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.mealInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .mealName {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
+  font-weight: 700;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex: 1;
+}
+
+.mealMacros {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.mealCalWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  gap: 1px;
 }
 
 .mealCal {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  flex-shrink: 0;
-  margin-left: 8px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--primary);
 }
 
+.mealCalUnit {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}

@@ -1,17 +1,17 @@
 import { useState, Suspense, lazy } from 'react'
-import { useSettings } from '../hooks/useSettings'
-import { useAuth } from '../context/AuthContext'
-import PageHeader from '../components/PageHeader'
-import { IconSettings } from '../components/icons'
-import styles from './Settings.module.css'
+import { useSettings } from '../../hooks/useSettings'
+import { useAuth } from '../../context/AuthContext'
+import PageHeader from '../../components/PageHeader'
+import { IconSettings } from '../../components/icons'
+import styles from './settings.module.css'
 
-const Onboarding = lazy(() => import('./Onboarding'))
+const Onboarding = lazy(() => import('../Onboarding'))
 
 const ACTIVITY_LABELS = {
-  sedentary: 'Sedentary',
-  light: 'Light',
-  moderate: 'Moderate',
-  active: 'Active',
+  sedentary:   'Sedentary',
+  light:       'Light',
+  moderate:    'Moderate',
+  active:      'Active',
   very_active: 'Very Active',
 }
 
@@ -19,6 +19,7 @@ export default function Settings() {
   const { user, logout } = useAuth()
   const { settings, refetch } = useSettings()
   const [showBodyStats, setShowBodyStats] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   const hasStats = settings.weightKg && settings.heightCm && settings.age
 
@@ -27,12 +28,7 @@ export default function Settings() {
       <PageHeader title="Settings" icon={IconSettings} />
 
       <div className={styles.profile}>
-        <img
-          src={user?.picture}
-          alt={user?.name}
-          className={styles.avatar}
-          referrerPolicy="no-referrer"
-        />
+        <img src={user?.picture} alt={user?.name} className={styles.avatar} referrerPolicy="no-referrer" />
         <div>
           <p className={styles.name}>{user?.name}</p>
           <p className={styles.email}>{user?.email}</p>
@@ -42,11 +38,7 @@ export default function Settings() {
       <div className={styles.form} style={{ marginBottom: 8 }}>
         <div className={styles.statsTitleRow}>
           <h2 className={styles.sectionTitle}>Body Stats</h2>
-          <button
-            type="button"
-            className={styles.editStatsBtn}
-            onClick={() => setShowBodyStats(true)}
-          >
+          <button type="button" className={styles.editStatsBtn} onClick={() => setShowBodyStats(true)}>
             {hasStats ? 'Edit' : 'Set Up'}
           </button>
         </div>
@@ -80,7 +72,6 @@ export default function Settings() {
         <p className={styles.statsEmpty} style={{ marginBottom: 12 }}>
           Goals are calculated from your body stats. Edit your stats above to update them.
         </p>
-
         <div className={styles.field}>
           <span className={styles.fieldLabel}>Calories</span>
           <span className={styles.fieldValue}>{settings.calorieGoal} kcal</span>
@@ -99,12 +90,27 @@ export default function Settings() {
         </div>
       </div>
 
-      <button className={styles.logoutBtn} onClick={logout}>Sign out</button>
+      <button className={styles.logoutBtn} onClick={() => setShowLogoutConfirm(true)}>Sign out</button>
+
+      {showLogoutConfirm && (
+        <div className={styles.confirmBackdrop} onClick={() => setShowLogoutConfirm(false)}>
+          <div className={styles.confirmSheet} onClick={e => e.stopPropagation()}>
+            <div className={styles.confirmHandle} />
+            <div className={styles.confirmBody}>
+              <p className={styles.confirmTitle}>Sign out?</p>
+              <p className={styles.confirmSub}>You'll need to sign in again to access your data.</p>
+              <button className={styles.confirmLogout} onClick={logout}>Sign out</button>
+              <button className={styles.confirmCancel} onClick={() => setShowLogoutConfirm(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showBodyStats && (
         <Suspense fallback={null}>
           <Onboarding
             mode="update"
+            onCancel={() => setShowBodyStats(false)}
             onComplete={async () => {
               await refetch()
               setShowBodyStats(false)

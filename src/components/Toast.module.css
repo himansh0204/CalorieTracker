@@ -1,0 +1,139 @@
+.container {
+  position: fixed;
+  bottom: calc(88px + env(safe-area-inset-bottom));
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 300;
+  pointer-events: none;
+  padding: 0 16px;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 440px;
+  border-radius: 14px;
+  padding: 13px 14px;
+  pointer-events: all;
+  animation: toastIn 0.28s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.exiting {
+  animation: toastOut 0.24s ease forwards;
+}
+
+@keyframes toastIn {
+  from { transform: translateY(18px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes toastOut {
+  from { transform: translateY(0);    opacity: 1; }
+  to   { transform: translateY(10px); opacity: 0; }
+}
+
+/* ── Types ── */
+.success {
+  background: #0f2b1e;
+  border: 1px solid rgba(52, 211, 153, 0.2);
+}
+
+.error {
+  background: #2a1111;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.info {
+  background: #171d28;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+/* ── Icon bubble ── */
+.icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.success .icon {
+  background: rgba(52, 211, 153, 0.18);
+  color: #34d399;
+}
+
+.error .icon {
+  background: rgba(239, 68, 68, 0.18);
+  color: #ef4444;
+}
+
+.info .icon {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-muted);
+}
+
+/* ── Text ── */
+.msg {
+  flex: 1;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+/* ── Actions ── */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.undoBtn {
+  background: none;
+  border: 1.5px solid rgba(212, 176, 106, 0.45);
+  color: var(--primary);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.undoBtn:hover {
+  background: rgba(212, 176, 106, 0.1);
+}
+
+.closeBtn {
+  background: rgba(255, 255, 255, 0.07);
+  border: none;
+  color: var(--text-muted);
+  border-radius: 8px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  line-height: 1;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}

@@ -35,15 +35,15 @@ export default function Login() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <div className={styles.logo}>🥗</div>
-        <h1 className={styles.title}>CalTrack</h1>
-        <p className={styles.subtitle}>Track calories &amp; macros with ease</p>
+        <img src="/logo.png" alt="CalQube" className={styles.logo} />
+        <h1 className={styles.title}>CalQube</h1>
+        <p className={styles.subtitle}>Your AI-powered nutrition companion</p>
 
         <ul className={styles.features}>
-          <li>📊 Daily calorie &amp; macro goals</li>
-          <li>🔍 Search 2M+ foods</li>
-          <li>📷 Barcode scanner</li>
-          <li>📅 30-day history</li>
+          <li><span>📷</span><span>Snap photo — AI estimates nutrition</span></li>
+          <li><span>🔥</span><span>Track calories &amp; macros daily</span></li>
+          <li><span>📈</span><span>Weekly AI nutrition report</span></li>
+          <li><span>📅</span><span>30-day meal history</span></li>
         </ul>
 
         {error && <p className={styles.errorMsg}>{error}</p>}

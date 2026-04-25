@@ -1,7 +1,7 @@
 {
-  "name": "Calorie Tracker",
-  "short_name": "CalTrack",
-  "description": "Track your daily calories and macros",
+  "name": "CalQube",
+  "short_name": "CalQube",
+  "description": "Track calories & macros with AI",
   "theme_color": "#4f46e5",
   "background_color": "#ffffff",
   "display": "standalone",

@@ -1,16 +1,18 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useFoodLog } from '../context/FoodLogContext'
-import PageHeader from '../components/PageHeader'
-import { IconAdd } from '../components/icons'
-import styles from './Scanner.module.css'
+import { useFoodLog } from '../../context/FoodLogContext'
+import { useToast } from '../../context/ToastContext'
+import PageHeader from '../../components/PageHeader'
+import { IconAdd } from '../../components/icons'
+import styles from './addmeal.module.css'
 
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack']
 const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
-export default function Scanner() {
+export default function AddMeal() {
   const navigate = useNavigate()
   const { logMeal } = useFoodLog()
+  const { showToast } = useToast()
   const fileInputRef = useRef(null)
 
   const [analyzing, setAnalyzing] = useState(false)
@@ -63,17 +65,22 @@ export default function Scanner() {
   async function handleLog() {
     if (!mealName.trim()) return
     setSaving(true)
-    await logMeal({
-      name: mealName.trim(),
-      mealType,
-      calories: Number(nutrients.calories) || 0,
-      protein: Number(nutrients.protein) || 0,
-      carbs: Number(nutrients.carbs) || 0,
-      fat: Number(nutrients.fat) || 0,
-      servingSize: '1 serving',
-    })
-    setSaving(false)
-    navigate('/')
+    try {
+      await logMeal({
+        name: mealName.trim(),
+        mealType,
+        calories: Number(nutrients.calories) || 0,
+        protein:  Number(nutrients.protein)  || 0,
+        carbs:    Number(nutrients.carbs)    || 0,
+        fat:      Number(nutrients.fat)      || 0,
+        servingSize: '1 serving',
+      })
+      showToast('Meal added to log')
+      navigate('/')
+    } catch (err) {
+      showToast(err.message || 'Failed to save meal', { type: 'error' })
+      setSaving(false)
+    }
   }
 
   function setField(field, val) {
@@ -84,27 +91,20 @@ export default function Scanner() {
     <div className={styles.page}>
       <PageHeader title="Add Meal" icon={IconAdd} showBack />
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        style={{ display: 'none' }}
-        onChange={handleFileChange}
-      />
-
       <div className={styles.scrollContent}>
-        {/* ── Take Photo CTA ── */}
-        <button
-          className={styles.photoCta}
-          onClick={() => fileInputRef.current?.click()}
-          disabled={analyzing}
-        >
-          {preview ? (
-            <img src={preview} alt="Meal" className={styles.photoPreview} />
-          ) : null}
+        <label className={`${styles.photoCta} ${analyzing ? styles.photoCtaDisabled : ''}`}>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+            disabled={analyzing}
+          />
 
-          {/* Overlay: spinner while analyzing, or CTA when no photo */}
+          {preview ? <img src={preview} alt="Meal" className={styles.photoPreview} /> : null}
+
           <div className={`${styles.photoOverlay} ${preview && !analyzing ? styles.photoOverlayHover : ''}`}>
             {analyzing ? (
               <>
@@ -114,22 +114,26 @@ export default function Scanner() {
             ) : (
               <>
                 <span className={styles.photoCtaIcon}>📷</span>
-                <span className={styles.photoCtaLabel}>
-                  {hasAI ? 'Retake Photo' : 'Take Photo'}
-                </span>
+                <span className={styles.photoCtaLabel}>{hasAI ? 'Retake Photo' : 'Take Photo'}</span>
                 {!preview && <span className={styles.photoCtaSub}>AI will estimate nutrition</span>}
               </>
             )}
           </div>
-        </button>
+        </label>
 
         {errorMsg ? (
-          <p className={styles.aiError}>⚠️ {errorMsg}</p>
+          <div className={styles.aiErrorWrap}>
+            <p className={styles.aiError}>⚠️ {errorMsg}</p>
+            {preview && (
+              <button className={styles.retryAnalysis} onClick={() => analyzeImage(preview)}>
+                Retry analysis
+              </button>
+            )}
+          </div>
         ) : hasAI ? (
           <p className={styles.aiSuccess}>✓ AI estimates filled in — adjust if needed</p>
         ) : null}
 
-        {/* ── Form (always visible) ── */}
         <div className={styles.addSection}>
           <div className={styles.formGroup}>
             <label className={styles.label}>Meal name</label>

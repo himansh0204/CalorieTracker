@@ -78,6 +78,39 @@ router.get('/', verifyToken, async (req, res) => {
   }
 })
 
+// Update a meal
+router.put('/:mealId', verifyToken, async (req, res) => {
+  try {
+    const userId = req.userId
+    const { mealId } = req.params
+    const { foodName, calories, protein, carbs, fat } = req.body
+
+    if (!foodName || typeof foodName !== 'string' || !foodName.trim()) {
+      return res.status(400).json({ error: 'foodName is required' })
+    }
+    if (calories === undefined || isNaN(Number(calories)) || Number(calories) < 0) {
+      return res.status(400).json({ error: 'calories must be a non-negative number' })
+    }
+
+    const result = await query(
+      `UPDATE meals
+       SET food_name = $1, calories = $2, protein = $3, carbs = $4, fat = $5
+       WHERE id = $6 AND user_id = $7
+       RETURNING *`,
+      [foodName, calories, protein || 0, carbs || 0, fat || 0, mealId, userId]
+    )
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Meal not found' })
+    }
+
+    res.json({ ok: true, meal: result.rows[0] })
+  } catch (error) {
+    console.error('Update meal error:', error)
+    res.status(500).json({ error: 'Failed to update meal' })
+  }
+})
+
 // Delete a meal
 router.delete('/:mealId', verifyToken, async (req, res) => {
   try {

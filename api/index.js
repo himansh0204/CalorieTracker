@@ -16,12 +16,12 @@ app.use(cors({
     if (origin.startsWith('http://localhost:')) return callback(null, true)
     if (origin.endsWith('.vercel.app')) return callback(null, true)
     if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) return callback(null, true)
-    return callback(new Error('Not allowed by CORS'))
+    return callback(Object.assign(new Error('Not allowed by CORS'), { status: 403 }))
   },
   credentials: true,
 }))
 
-app.use(express.json())
+app.use(express.json({ limit: '10mb' }))
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -36,13 +36,29 @@ app.use('/api/analytics', analyticsRoutes)
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ error: 'Not found' })
+  res.status(404).json({ error: `Route ${req.method} ${req.path} not found` })
 })
 
-// Error handler
-app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err)
-  res.status(500).json({ error: 'Internal server error' })
+// Global error handler
+app.use((err, req, res, _next) => {
+  const status = err.status || err.statusCode || 500
+  console.error(`[${new Date().toISOString()}] ${req.method} ${req.path} → ${status}`, {
+    message: err.message,
+    stack: process.env.NODE_ENV !== 'production' ? err.stack : undefined,
+  })
+  res.status(status).json({
+    error: status === 500 ? 'Internal server error' : err.message,
+  })
+})
+
+// Catch unhandled promise rejections so the process doesn't crash silently
+process.on('unhandledRejection', (reason) => {
+  console.error('[unhandledRejection]', reason)
+})
+
+process.on('uncaughtException', (err) => {
+  console.error('[uncaughtException]', err)
+  process.exit(1)
 })
 
 const PORT = process.env.PORT || 3001

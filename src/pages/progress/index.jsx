@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import PageHeader from '../components/PageHeader'
-import EmptyMealState from '../components/EmptyMealState'
-import { useTotalMeals } from '../hooks/useTotalMeals'
-import { IconProgress } from '../components/icons'
-import styles from './Progress.module.css'
+import PageHeader from '../../components/PageHeader'
+import EmptyMealState from '../../components/EmptyMealState'
+import { useTotalMeals } from '../../hooks/useTotalMeals'
+import { IconProgress } from '../../components/icons'
+import ProgressChart, { groupIntoWeeks, FAT_COLOR, CARBS_COLOR, PROTEIN_COLOR } from './ProgressChart'
+import styles from './progress.module.css'
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
@@ -14,112 +15,12 @@ const PERIODS = [
   { key: 'month',     label: 'Month' },
 ]
 
-const FAT_COLOR    = '#f59e0b'
-const CARBS_COLOR  = '#8b5cf6'
-const PROTEIN_COLOR = '#22c55e'
-
-const CHART_H = 160 // px — height of the bars area
-const GRID_COUNT = 4
-
-function calcCeiling(days) {
-  const max = Math.max(...days.map(d => d.protein * 4 + d.carbs * 4 + d.fat * 9), 200)
-  return Math.ceil(max / 500) * 500
-}
-
-function groupIntoWeeks(days) {
-  const weeks = []
-  let weekNum = 0
-  let current = null
-  for (const day of days) {
-    const dow = new Date(day.date + 'T12:00:00').getDay() // 0=Sun
-    if (current === null || dow === 1) {
-      weekNum++
-      current = { date: day.date, label: `W${weekNum}`, calories: 0, protein: 0, carbs: 0, fat: 0 }
-      weeks.push(current)
-    }
-    current.calories += day.calories
-    current.protein  += day.protein
-    current.carbs    += day.carbs
-    current.fat      += day.fat
-  }
-  return weeks
-}
-
-function ProgressChart({ days }) {
-  const ceiling = calcCeiling(days)
-  const gridStep = ceiling / GRID_COUNT
-
-  return (
-    <div className={styles.chartContainer}>
-      {/* Y-axis labels */}
-      <div className={styles.yAxis}>
-        {Array.from({ length: GRID_COUNT + 1 }, (_, i) => GRID_COUNT - i).map(i => (
-          <span key={i} className={styles.yLabel}>
-            {Math.round(i * gridStep).toLocaleString()}
-          </span>
-        ))}
-      </div>
-
-      {/* Chart body */}
-      <div className={styles.chartBody}>
-        <div className={styles.barsArea} style={{ height: CHART_H }}>
-          {/* Gridlines */}
-          {Array.from({ length: GRID_COUNT }, (_, i) => (
-            <div
-              key={i}
-              className={styles.gridLine}
-              style={{ bottom: `${((i + 1) / GRID_COUNT) * 100}%` }}
-            />
-          ))}
-          {/* Zero line */}
-          <div className={styles.zeroLine} />
-
-          {/* Bars */}
-          <div className={styles.barsRow}>
-            {days.map(d => {
-              const fatCal     = d.fat * 9
-              const carbCal    = d.carbs * 4
-              const proteinCal = d.protein * 4
-              const total      = fatCal + carbCal + proteinCal
-              const barH       = Math.max(0, Math.round((total / ceiling) * CHART_H))
-
-              return (
-                <div key={d.date} className={styles.barCol}>
-                  {total > 0 ? (
-                    <div
-                      className={styles.bar}
-                      style={{ height: barH }}
-                    >
-                      <div style={{ flex: fatCal,     background: FAT_COLOR,     borderRadius: fatCal > 0 && carbCal === 0 && proteinCal === 0 ? '4px 4px 0 0' : '4px 4px 0 0' }} />
-                      <div style={{ flex: carbCal,    background: CARBS_COLOR }} />
-                      <div style={{ flex: proteinCal, background: PROTEIN_COLOR, borderRadius: '0 0 4px 4px' }} />
-                    </div>
-                  ) : (
-                    <div className={styles.barEmpty} />
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* X-axis labels */}
-        <div className={styles.xAxis}>
-          {days.map(d => (
-            <span key={d.date} className={styles.xLabel}>{d.label}</span>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function Progress() {
   const totalMeals = useTotalMeals()
-  const [period, setPeriod]     = useState('week')
-  const [data, setData]         = useState(null)
-  const [loading, setLoading]   = useState(true)
-  const [error, setError]       = useState('')
+  const [period, setPeriod]   = useState('week')
+  const [data, setData]       = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError]     = useState('')
 
   useEffect(() => {
     async function load() {
@@ -164,7 +65,6 @@ export default function Progress() {
         </div>
       ) : data ? (
         <>
-          {/* Period selector */}
           <div className={styles.periodRow}>
             {PERIODS.map(p => (
               <button
@@ -178,19 +78,16 @@ export default function Progress() {
           </div>
 
           <div className={styles.content}>
-            {/* Total kcal */}
             <div className={styles.totalRow}>
               <span className={styles.fireIcon}>🔥</span>
               <span className={styles.totalKcal}>{data.totalCalories.toLocaleString()}</span>
               <span className={styles.kcalLabel}>kcal</span>
             </div>
 
-            {/* Chart */}
             <div className={styles.chartCard}>
               <ProgressChart days={chartDays} />
             </div>
 
-            {/* Legend */}
             <div className={styles.legend}>
               <div className={styles.legendItem}>
                 <span className={styles.legendDot} style={{ background: FAT_COLOR }} />
@@ -206,7 +103,6 @@ export default function Progress() {
               </div>
             </div>
 
-            {/* Breakdown list */}
             <div className={styles.breakdownList}>
               {data.days.filter(d => d.calories > 0).map(d => (
                 <div key={d.date} className={styles.breakdownRow}>

@@ -18,8 +18,26 @@
   padding: 28px 24px 24px;
   display: flex;
   flex-direction: column;
+  position: relative;
   gap: 20px;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+}
+
+.closeBtn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border: none;
+  border-radius: 8px;
+  color: var(--text-muted);
+  width: 30px;
+  height: 30px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Progress */

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from './AuthContext'
 
 const FoodLogContext = createContext(null)
@@ -10,6 +10,10 @@ export function FoodLogProvider({ children }) {
   const [selectedDate, setSelectedDate] = useState(todayStr())
   const [meals, setMeals] = useState([])
   const [loading, setLoading] = useState(false)
+
+  // Pending-delete: meals hidden from view for 4s (undo window)
+  const [hiddenMealIds, setHiddenMealIds] = useState(() => new Set())
+  const pendingDeleteTimers = useRef({})
 
   const fetchMeals = useCallback(async () => {
     if (!user) return
@@ -36,7 +40,7 @@ export function FoodLogProvider({ children }) {
   async function logMeal(meal) {
     if (!user) return
     const token = localStorage.getItem('authToken')
-    
+
     await withTimeout(
       fetch(`${API_BASE}/meals`, {
         method: 'POST',
@@ -59,23 +63,79 @@ export function FoodLogProvider({ children }) {
       }),
       MEAL_SAVE_TIMEOUT_MS
     )
-    
+
     await withTimeout(fetchMeals(), MEAL_SAVE_TIMEOUT_MS)
+  }
+
+  async function updateMeal(mealId, data) {
+    if (!user) return
+    const token = localStorage.getItem('authToken')
+    const res = await fetch(`${API_BASE}/meals/${mealId}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error(err.error || `Update failed (${res.status})`)
+    }
+    await fetchMeals()
   }
 
   async function removeMeal(mealId) {
     if (!user) return
     const token = localStorage.getItem('authToken')
-    
+
     await fetch(`${API_BASE}/meals/${mealId}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` },
     })
-    
-    setMeals((prev) => prev.filter((m) => m.id !== mealId))
+
+    setMeals(prev => prev.filter(m => m.id !== mealId))
   }
 
-  const totals = meals.reduce(
+  // Hides a meal immediately, then permanently deletes after 4s (undo window)
+  function scheduleRemoveMeal(mealId) {
+    setHiddenMealIds(prev => new Set([...prev, mealId]))
+
+    pendingDeleteTimers.current[mealId] = setTimeout(async () => {
+      const token = localStorage.getItem('authToken')
+      try {
+        await fetch(`${API_BASE}/meals/${mealId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` },
+        })
+      } catch (err) {
+        console.error('[scheduleRemoveMeal] Delete failed', err)
+      }
+      setMeals(prev => prev.filter(m => m.id !== mealId))
+      setHiddenMealIds(prev => {
+        const next = new Set(prev)
+        next.delete(mealId)
+        return next
+      })
+      delete pendingDeleteTimers.current[mealId]
+    }, 4000)
+  }
+
+  // Cancels a pending delete and restores the meal
+  function undoRemoveMeal(mealId) {
+    clearTimeout(pendingDeleteTimers.current[mealId])
+    delete pendingDeleteTimers.current[mealId]
+    setHiddenMealIds(prev => {
+      const next = new Set(prev)
+      next.delete(mealId)
+      return next
+    })
+  }
+
+  // Meals visible to the UI (excludes pending-delete meals)
+  const visibleMeals = meals.filter(m => !hiddenMealIds.has(m.id))
+
+  const totals = visibleMeals.reduce(
     (acc, m) => ({
       calories: acc.calories + (parseFloat(m.calories) || 0),
       protein: acc.protein + (parseFloat(m.protein) || 0),
@@ -87,7 +147,20 @@ export function FoodLogProvider({ children }) {
 
   return (
     <FoodLogContext.Provider
-      value={{ meals, totals, loading, selectedDate, setSelectedDate, logMeal, removeMeal, fetchMeals }}
+      value={{
+        meals,
+        visibleMeals,
+        totals,
+        loading,
+        selectedDate,
+        setSelectedDate,
+        logMeal,
+        updateMeal,
+        removeMeal,
+        scheduleRemoveMeal,
+        undoRemoveMeal,
+        fetchMeals,
+      }}
     >
       {children}
     </FoodLogContext.Provider>

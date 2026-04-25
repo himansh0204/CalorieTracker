@@ -41,7 +41,7 @@ function calcGoals({ gender, age, weightKg, heightCm, activityLevel, goalWeightK
   return { calorieGoal, proteinGoal, carbsGoal, fatGoal }
 }
 
-export default function Onboarding({ onComplete, mode = 'setup' }) {
+export default function Onboarding({ onComplete, onCancel, mode = 'setup' }) {
   const [step, setStep] = useState(1)
   const [form, setForm] = useState({
     gender: '',
@@ -101,6 +101,11 @@ export default function Onboarding({ onComplete, mode = 'setup' }) {
   return (
     <div className={styles.overlay}>
       <div className={styles.card}>
+        {/* Close button — only in update mode */}
+        {onCancel && (
+          <button type="button" className={styles.closeBtn} onClick={onCancel}>✕</button>
+        )}
+
         {/* Progress bar */}
         <div className={styles.progressBar}>
           {[1, 2, 3, 4].map((s) => (

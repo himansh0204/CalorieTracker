@@ -14,12 +14,23 @@
   padding: clamp(8px, 3vw, 12px) clamp(12px, 4.5vw, 18px) clamp(10px, 3.5vw, 14px);
 }
 
-.eyebrow {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-muted);
-  font-weight: 700;
+.brandRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brandLogo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.brandName {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: 0.01em;
 }
 
 .greeting {
@@ -36,38 +47,6 @@
   gap: 8px;
 }
 
-.dateNav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(16, 20, 28, 0.92);
-  border-radius: 12px;
-  padding: 2px 4px;
-}
-
-.dateNav button {
-  background: none;
-  border: none;
-  font-size: 1.25rem;
-  color: var(--primary);
-  cursor: pointer;
-  padding: 0 4px;
-  line-height: 1;
-}
-
-.dateNav button:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
-
-.dateLabel {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text);
-  min-width: 66px;
-  text-align: center;
-}
 
 .avatar {
   width: 38px;
@@ -96,84 +75,141 @@
   color: var(--text);
 }
 
-/* ---------- Week strip ---------- */
+/* ---------- Week strip (paginated Mon–Sun) ---------- */
 .weekStrip {
   display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  /* no padding/gap — pages handle their own padding */
+}
+
+.weekStrip::-webkit-scrollbar { display: none; }
+
+/* One full-width page per week */
+.weekPage {
+  min-width: 100%;
+  width: 100%;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  padding: 6px 12px 10px;
+  box-sizing: border-box;
+}
+
+/* Row of 7 day buttons */
+.weekDays {
+  display: flex;
   justify-content: space-between;
-  padding: clamp(6px, 2.5vw, 10px) clamp(12px, 4.5vw, 18px) clamp(4px, 1.5vw, 6px);
 }
 
 .weekDay {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 3px 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s;
+  font-family: inherit;
+}
+
+.weekDayFuture {
+  opacity: 0.28;
+  cursor: default;
+}
+
+.weekDayLabel {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .weekCircle {
-  width: clamp(28px, 8.5vw, 36px);
-  height: clamp(28px, 8.5vw, 36px);
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 1.5px dashed rgba(255, 255, 255, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
 }
 
-.weekLabel {
-  font-size: 0.78rem;
+.weekNum {
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--text-muted);
+  line-height: 1;
 }
 
-/* Today — accent ring */
-.weekToday {
-  border-color: var(--primary);
-  border-width: 2.5px;
-}
-
-.weekToday .weekLabel {
-  color: var(--primary);
-}
-
-/* Logged day — filled */
-.weekLogged {
+/* Selected + under/at goal — solid gold fill */
+.weekSelected {
   background: var(--primary);
+  border-style: solid;
   border-color: var(--primary);
 }
 
-.weekLogged .weekLabel {
+.weekSelected .weekNum {
+  color: #000;
+  font-weight: 800;
+}
+
+/* Selected + over goal — solid red fill */
+.weekSelectedOver {
+  background: #ef4444;
+  border-style: solid;
+  border-color: #ef4444;
+}
+
+.weekSelectedOver .weekNum {
   color: #fff;
+  font-weight: 800;
 }
 
-/* Future day — dimmed */
-.weekFuture {
-  border-color: rgba(255, 255, 255, 0.06);
-  opacity: 0.4;
+/* Today (not selected, not logged) — primary dashed ring with accent color */
+.weekToday {
+  border-style: solid;
+  border-color: var(--primary);
+  border-width: 2px;
 }
 
-.weekDate {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-.weekDateToday {
+.weekToday .weekNum {
   color: var(--primary);
 }
 
-/* ---------- Date nav row (moved out of header) ---------- */
-.dateNavRow {
-  display: flex;
-  justify-content: center;
-  padding: 2px 18px 10px;
+/* Logged + under/at goal (not selected) — gold solid ring */
+.weekLogged {
+  border-style: solid;
+  border-color: var(--primary);
+  border-width: 2px;
 }
+
+.weekLogged .weekNum {
+  color: var(--primary);
+}
+
+/* Logged + over goal (not selected) — red solid ring */
+.weekOver {
+  border-style: solid;
+  border-color: #ef4444;
+  border-width: 2px;
+}
+
+.weekOver .weekNum {
+  color: #ef4444;
+}
+
 
 /* ---------- Nutrition grid (calories + macros) ---------- */
 .nutritionGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.5fr 1fr;
   gap: clamp(6px, 2.5vw, 10px);
   margin: 0 clamp(6px, 3.5vw, 14px) clamp(8px, 3vw, 12px);
 }
@@ -336,10 +372,11 @@
   min-height: 86px;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
   gap: 4px;
   cursor: pointer;
-  text-align: left;
+  text-align: center;
 }
 
 .reportCard {
@@ -520,7 +557,6 @@
   -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
-  justify-content: center;
 }
 
 .mealHeader {
@@ -544,11 +580,24 @@
   font-weight: 700;
 }
 
+.seeAll {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+}
+
 .empty {
   color: var(--text-muted);
   text-align: center;
   padding: 24px 0;
   font-size: 0.9rem;
+}
+
+.emptyWrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
 }
 
 /* ── Responsive: content-based breakpoint where layout needs help ── */

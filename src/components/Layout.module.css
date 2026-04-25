@@ -65,6 +65,18 @@
   letter-spacing: 0.02em;
 }
 
+.navPrimary {
+  flex: 1.35;
+}
+
+.navPrimary .navIcon svg {
+  transform: scale(1.28);
+}
+
+.navPrimary .navLabel {
+  font-size: 0.68rem;
+}
+
 @media (max-width: 360px) {
   .navLabel {
     font-size: 0.58rem;

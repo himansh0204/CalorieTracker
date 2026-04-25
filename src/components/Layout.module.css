@@ -54,9 +54,9 @@
 }
 
 .navIcon {
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
 }
 

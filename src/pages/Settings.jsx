@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Suspense, lazy } from 'react'
+import { useState, Suspense, lazy } from 'react'
 import { useSettings } from '../hooks/useSettings'
 import { useAuth } from '../context/AuthContext'
 import styles from './Settings.module.css'
@@ -15,47 +15,8 @@ const ACTIVITY_LABELS = {
 
 export default function Settings() {
   const { user, logout } = useAuth()
-  const { settings, loading, updateSettings, refetch } = useSettings()
-  const [form, setForm] = useState(settings)
-  const [saveState, setSaveState] = useState('idle')
-  const [toast, setToast] = useState(null)
+  const { settings, loading, refetch } = useSettings()
   const [showBodyStats, setShowBodyStats] = useState(false)
-  const toastTimerRef = useRef(null)
-
-  useEffect(() => { setForm(settings) }, [settings])
-
-  useEffect(() => {
-    return () => {
-      if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
-    }
-  }, [])
-
-  function handleChange(key, val) {
-    const n = Number(val)
-    setForm((f) => ({ ...f, [key]: Number.isFinite(n) ? n : 0 }))
-  }
-
-  function showToast(message, kind = 'success') {
-    if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
-    setToast({ message, kind })
-    toastTimerRef.current = setTimeout(() => {
-      setToast(null)
-      toastTimerRef.current = null
-    }, 3500)
-  }
-
-  async function handleSave(e) {
-    e.preventDefault()
-    setSaveState('saving')
-    const result = await updateSettings(form)
-    setSaveState('idle')
-
-    if (result?.ok) {
-      showToast('Goals updated', 'success')
-    } else {
-      showToast('Saved locally. Cloud sync pending.', 'warn')
-    }
-  }
 
   const hasStats = settings.weightKg && settings.heightCm && settings.age
 
@@ -79,7 +40,6 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Body Stats card */}
       <div className={styles.form} style={{ marginBottom: 8 }}>
         <div className={styles.statsTitleRow}>
           <h2 className={styles.sectionTitle}>Body Stats</h2>
@@ -116,58 +76,31 @@ export default function Settings() {
         )}
       </div>
 
-      <form onSubmit={handleSave} className={styles.form}>
+      <div className={styles.form}>
         <h2 className={styles.sectionTitle}>Daily Goals</h2>
+        <p className={styles.statsEmpty} style={{ marginBottom: 12 }}>
+          Goals are calculated from your body stats. Edit your stats above to update them.
+        </p>
 
-        <GoalField
-          label="Calories"
-          unit="kcal"
-          value={form.calorieGoal}
-          onChange={(v) => handleChange('calorieGoal', v)}
-        />
-        <GoalField
-          label="Protein"
-          unit="g"
-          value={form.proteinGoal}
-          onChange={(v) => handleChange('proteinGoal', v)}
-        />
-        <GoalField
-          label="Carbohydrates"
-          unit="g"
-          value={form.carbsGoal}
-          onChange={(v) => handleChange('carbsGoal', v)}
-        />
-        <GoalField
-          label="Fat"
-          unit="g"
-          value={form.fatGoal}
-          onChange={(v) => handleChange('fatGoal', v)}
-        />
-
-        <button type="submit" className={styles.saveBtn} disabled={saveState === 'saving'}>
-          {saveState === 'saving' ? 'Saving…' : 'Save goals'}
-        </button>
-      </form>
+        <div className={styles.field}>
+          <span className={styles.fieldLabel}>Calories</span>
+          <span className={styles.fieldValue}>{settings.calorieGoal} kcal</span>
+        </div>
+        <div className={styles.field}>
+          <span className={styles.fieldLabel}>Protein</span>
+          <span className={styles.fieldValue}>{settings.proteinGoal} g</span>
+        </div>
+        <div className={styles.field}>
+          <span className={styles.fieldLabel}>Carbohydrates</span>
+          <span className={styles.fieldValue}>{settings.carbsGoal} g</span>
+        </div>
+        <div className={styles.field}>
+          <span className={styles.fieldLabel}>Fat</span>
+          <span className={styles.fieldValue}>{settings.fatGoal} g</span>
+        </div>
+      </div>
 
       <button className={styles.logoutBtn} onClick={logout}>Sign out</button>
-
-      {toast && (
-        <div
-          className={`${styles.toast} ${toast.kind === 'warn' ? styles.toastWarn : styles.toastSuccess}`}
-          role="status"
-          aria-live="polite"
-        >
-          <span>{toast.message}</span>
-          <button
-            type="button"
-            className={styles.toastClose}
-            onClick={() => setToast(null)}
-            aria-label="Dismiss notification"
-          >
-            ✕
-          </button>
-        </div>
-      )}
 
       {showBodyStats && (
         <Suspense fallback={null}>
@@ -176,30 +109,10 @@ export default function Settings() {
             onComplete={async () => {
               await refetch()
               setShowBodyStats(false)
-              showToast('Stats & goals updated', 'success')
             }}
           />
         </Suspense>
       )}
-    </div>
-  )
-}
-
-function GoalField({ label, unit, value, onChange }) {
-  return (
-    <div className={styles.field}>
-      <label className={styles.fieldLabel}>{label}</label>
-      <div className={styles.fieldRight}>
-        <input
-          type="number"
-          min="0"
-          step="1"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={styles.input}
-        />
-        <span className={styles.unit}>{unit}</span>
-      </div>
     </div>
   )
 }

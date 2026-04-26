@@ -2,10 +2,11 @@ import { Outlet, NavLink } from 'react-router-dom'
 import { IconHome, IconAdd, IconProgress, IconHistory, IconSettings } from './icons'
 import styles from './Layout.module.css'
 
-const navItems = [
+const leftItems  = [
   { to: '/', label: 'Home', icon: IconHome, end: true },
   { to: '/progress', label: 'Progress', icon: IconProgress },
-  { to: '/scanner', label: 'Scan Food', icon: IconAdd, primary: true },
+]
+const rightItems = [
   { to: '/history', label: 'History', icon: IconHistory },
   { to: '/settings', label: 'Settings', icon: IconSettings },
 ]
@@ -17,14 +18,27 @@ export default function Layout() {
         <Outlet />
       </main>
       <nav className={styles.nav}>
-        {navItems.map(({ to, label, icon: Icon, end, primary }) => (
+        {leftItems.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}
             end={end}
-            className={({ isActive }) =>
-              `${styles.navItem} ${primary ? styles.navPrimary : ''} ${isActive ? styles.active : ''}`
-            }
+            className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
+          >
+            <span className={styles.navIcon}><Icon /></span>
+            <span className={styles.navLabel}>{label}</span>
+          </NavLink>
+        ))}
+
+        <NavLink to="/scanner" className={({ isActive }) => `${styles.navCenter} ${isActive ? styles.navCenterActive : ''}`}>
+          <IconAdd size={26} />
+        </NavLink>
+
+        {rightItems.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
           >
             <span className={styles.navIcon}><Icon /></span>
             <span className={styles.navLabel}>{label}</span>

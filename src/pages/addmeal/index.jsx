@@ -108,7 +108,6 @@ export default function AddMeal() {
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            capture="environment"
             style={{ display: 'none' }}
             onChange={handleFileChange}
             disabled={analyzing}

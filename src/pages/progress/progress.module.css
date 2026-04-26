@@ -36,22 +36,22 @@
 .periodBtn {
   flex: 1;
   background: var(--surface-2);
-  border: 1px solid var(--border-soft);
+  border: none;
   border-radius: 999px;
-  padding: 7px 8px;
+  padding: 8px 10px;
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
   white-space: nowrap;
   text-align: center;
-  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  transition: color 0.15s, background 0.15s;
 }
 
 .periodActive {
-  background: var(--primary-soft);
-  border-color: var(--primary);
-  color: var(--primary);
+  background: #ffffffb8;
+  color: #000;
+  font-weight: 700;
 }
 
 /* ── Loading / Error ── */
@@ -257,16 +257,16 @@
 
 .bar {
   width: 100%;
-  max-width: 32px;
+  max-width: 26px;
   display: flex;
   flex-direction: column;
-  border-radius: 4px 4px 0 0;
+  border-radius: 6px 6px 2px 2px;
   overflow: hidden;
 }
 
 .barEmpty {
   width: 100%;
-  max-width: 32px;
+  max-width: 26px;
   height: 3px;
   background: rgba(255, 255, 255, 0.06);
   border-radius: 2px;
@@ -305,6 +305,12 @@
   width: 9px;
   height: 9px;
   border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legendIcon {
+  display: flex;
+  align-items: center;
   flex-shrink: 0;
 }
 
@@ -491,7 +497,6 @@
 .calCountNum {
   font-size: 1rem;
   font-weight: 800;
-  color: var(--primary);
 }
 
 .calCountTotal {
@@ -555,7 +560,7 @@
 }
 
 .calDayLogged {
-  background: var(--primary);
+  background: #ffffffb8;
   color: #000;
 }
 

@@ -1,9 +1,13 @@
 import styles from './progress.module.css'
 
-const FAT_COLOR     = '#f59e0b'
-const CARBS_COLOR   = '#8b5cf6'
-const PROTEIN_COLOR = '#22c55e'
-const CHART_H = 90
+const FAT_COLOR     = '#60a5fa'
+const CARBS_COLOR   = '#34d399'
+const PROTEIN_COLOR = '#fb923c'
+
+const FAT_GRADIENT     = 'linear-gradient(180deg, #93c5fd 0%, #2563eb 100%)'
+const CARBS_GRADIENT   = 'linear-gradient(180deg, #6ee7b7 0%, #059669 100%)'
+const PROTEIN_GRADIENT = 'linear-gradient(180deg, #fdba74 0%, #ea580c 100%)'
+const CHART_H = 130
 const GRID_COUNT = 4
 
 function calcCeiling(days) {
@@ -68,10 +72,13 @@ export default function ProgressChart({ days }) {
               return (
                 <div key={d.date} className={styles.barCol}>
                   {total > 0 ? (
-                    <div className={styles.bar} style={{ height: barH }}>
-                      <div style={{ flex: fatCal,     background: FAT_COLOR,     borderRadius: '4px 4px 0 0' }} />
-                      <div style={{ flex: carbCal,    background: CARBS_COLOR }} />
-                      <div style={{ flex: proteinCal, background: PROTEIN_COLOR, borderRadius: '0 0 4px 4px' }} />
+                    <div
+                      className={styles.bar}
+                      style={{ height: barH }}
+                    >
+                      <div style={{ flex: fatCal,     background: FAT_GRADIENT,     borderRadius: '6px 6px 0 0' }} />
+                      <div style={{ flex: carbCal,    background: CARBS_GRADIENT }} />
+                      <div style={{ flex: proteinCal, background: PROTEIN_GRADIENT, borderRadius: '0 0 2px 2px' }} />
                     </div>
                   ) : (
                     <div className={styles.barEmpty} />

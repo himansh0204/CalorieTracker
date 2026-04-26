@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import EmptyMealState from '../../components/EmptyMealState'
 import { useTotalMeals } from '../../hooks/useTotalMeals'
-import ProgressChart, { groupIntoWeeks, FAT_COLOR, CARBS_COLOR, PROTEIN_COLOR } from './ProgressChart'
+import ProgressChart, { groupIntoWeeks, FAT_COLOR, CARBS_COLOR } from './ProgressChart'
 import BMICard from './BMICard'
 import CalendarCard from './CalendarCard'
 import WeeklyReportSheet from '../home/WeeklyReportSheet'
 import styles from './progress.module.css'
-import { CalorieIcon } from '../../components/NutrientIcons'
+import { CalorieIcon, ProteinIcon, CarbsIcon, FatIcon } from '../../components/NutrientIcons'
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
@@ -109,16 +109,16 @@ export default function Progress() {
               <ProgressChart days={chartDays} />
               <div className={styles.legend}>
                 <div className={styles.legendItem}>
-                  <span className={styles.legendDot} style={{ background: FAT_COLOR }} />
-                  <span className={styles.legendLabel}>Fat</span>
+                  <span className={styles.legendIcon} style={{ color: '#fb923c' }}><ProteinIcon size={14} /></span>
+                  <span className={styles.legendLabel}>Protein</span>
                 </div>
                 <div className={styles.legendItem}>
-                  <span className={styles.legendDot} style={{ background: CARBS_COLOR }} />
+                  <span className={styles.legendIcon} style={{ color: CARBS_COLOR }}><CarbsIcon size={14} /></span>
                   <span className={styles.legendLabel}>Carbs</span>
                 </div>
                 <div className={styles.legendItem}>
-                  <span className={styles.legendDot} style={{ background: PROTEIN_COLOR }} />
-                  <span className={styles.legendLabel}>Protein</span>
+                  <span className={styles.legendIcon} style={{ color: FAT_COLOR }}><FatIcon size={14} /></span>
+                  <span className={styles.legendLabel}>Fat</span>
                 </div>
               </div>
             </div>

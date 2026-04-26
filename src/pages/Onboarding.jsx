@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import styles from './Onboarding.module.css'
+import { useToast } from '../context/ToastContext'
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
@@ -52,21 +53,45 @@ export default function Onboarding({ onComplete, onCancel, mode = 'setup' }) {
     activityLevel: 'moderate',
   })
   const [submitting, setSubmitting] = useState(false)
+  const { showToast } = useToast()
   const [error, setError] = useState(null)
 
   const goals = step === 4 && form.gender && form.age && form.weightKg && form.heightCm
     ? calcGoals(form)
     : null
 
+  const BOUNDS = { age: [1, 120], heightCm: [50, 272], weightKg: [10, 500], goalWeightKg: [10, 500] }
   function set(key, val) {
+    if (BOUNDS[key] && val !== '') {
+      const n = Number(val)
+      if (isNaN(n) || n < 0) return
+      if (n > BOUNDS[key][1]) return
+    }
     setForm((f) => ({ ...f, [key]: val }))
   }
 
   function canProceed() {
     if (step === 1) return form.gender && form.age
     if (step === 2) return form.heightCm && form.weightKg
-    if (step === 3) return true
     return true
+  }
+
+  function handleNext() {
+    if (step === 1) {
+      if (!form.gender) { showToast('Please select a gender', { type: 'error' }); return }
+      const age = Number(form.age)
+      if (!form.age || age < 1 || age > 120) { showToast('Please enter a valid age (1–120)', { type: 'error' }); return }
+    }
+    if (step === 2) {
+      const h = Number(form.heightCm), w = Number(form.weightKg)
+      if (!form.heightCm || h < 50 || h > 272) { showToast('Please enter a valid height (50–272 cm)', { type: 'error' }); return }
+      if (!form.weightKg || w < 10 || w > 500) { showToast('Please enter a valid weight (10–500 kg)', { type: 'error' }); return }
+      if (form.goalWeightKg) {
+        const gw = Number(form.goalWeightKg)
+        if (gw < 10 || gw > 500) { showToast('Please enter a valid goal weight (10–500 kg)', { type: 'error' }); return }
+      }
+    }
+    setStep((s) => s + 1)
   }
 
   async function handleConfirm() {
@@ -273,8 +298,7 @@ export default function Onboarding({ onComplete, onCancel, mode = 'setup' }) {
             <button
               type="button"
               className={styles.nextBtn}
-              disabled={!canProceed()}
-              onClick={() => setStep((s) => s + 1)}
+              onClick={handleNext}
             >
               Next
             </button>

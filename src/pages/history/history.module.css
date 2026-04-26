@@ -23,12 +23,20 @@
 }
 
 .list {
-  list-style: none;
   padding: clamp(8px, 3vw, 12px) clamp(10px, 4vw, 16px);
   margin: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.dateSeparator {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin: 6px 4px 0;
 }
 
 .item {

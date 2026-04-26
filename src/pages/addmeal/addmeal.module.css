@@ -52,14 +52,17 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .retryBtn {
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
   padding: 10px 24px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
+  font-family: inherit;
   margin-top: 8px;
+  transition: all 0.15s;
 }
 
 /* Add section */
@@ -164,7 +167,7 @@
 
 .mealTypePillActive {
   background: var(--primary-soft);
-  border-color: var(--primary);
+  border-color: rgba(255, 255, 255, 0.6);
   color: var(--primary);
 }
 
@@ -224,47 +227,51 @@
 
 .logBtn {
   width: 100%;
-  padding: 15px;
-  background: var(--primary);
-  color: #fff;
+  padding: 13px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #05070c;
   border: none;
-  border-radius: 14px;
-  font-size: 1rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
+  font-family: inherit;
   margin-top: auto;
   flex-shrink: 0;
+  transition: opacity 0.15s;
 }
 
 .logBtn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 /* ─── Tabs ─────────────────────────────────────────────────────────── */
 
 .tabs {
   display: flex;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  gap: 8px;
+  padding: 0 16px 12px;
   flex-shrink: 0;
 }
 
 .tab {
   flex: 1;
-  background: none;
-  border: none;
-  padding: 12px 0;
-  font-size: 0.9rem;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 7px 4px;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: color 0.15s, border-color 0.15s;
+  font-family: inherit;
+  transition: all 0.15s;
 }
 
 .tabActive {
+  background: var(--primary-soft);
+  border-color: rgba(255, 255, 255, 0.6);
   color: var(--primary);
-  border-bottom-color: var(--primary);
 }
 
 /* ─── AI Photo mode ─────────────────────────────────────────────────── */
@@ -295,7 +302,7 @@
 }
 
 .photoCta:hover {
-  border-color: var(--primary);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .photoCtaDisabled {
@@ -373,20 +380,20 @@
 }
 
 .retryAnalysis {
-  background: none;
-  border: 1.5px solid rgba(239, 68, 68, 0.4);
-  color: #ef4444;
-  border-radius: 8px;
-  padding: 6px 14px;
-  font-size: 0.78rem;
+  background: #c0392bbd;
+  border: none;
+  color: #fff;
+  border-radius: 12px;
+  padding: 7px 14px;
+  font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
-  transition: background 0.15s;
+  transition: opacity 0.15s;
 }
 
-.retryAnalysis:hover {
-  background: rgba(239, 68, 68, 0.08);
+.retryAnalysis:active {
+  opacity: 0.85;
 }
 
 /* AI badge */
@@ -431,7 +438,7 @@
 }
 
 .nameInput:focus {
-  border-color: var(--primary);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 /* Editable nutrition grid */

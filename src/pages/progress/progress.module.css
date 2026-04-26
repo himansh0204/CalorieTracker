@@ -36,21 +36,23 @@
 .periodBtn {
   flex: 1;
   background: var(--surface-2);
-  border: none;
-  border-radius: 999px;
-  padding: 8px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 7px 4px;
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
   white-space: nowrap;
   text-align: center;
-  transition: color 0.15s, background 0.15s;
+  font-family: inherit;
+  transition: all 0.15s;
 }
 
 .periodActive {
-  background: #ffffffb8;
-  color: #000;
+  background: var(--primary-soft);
+  border-color: rgba(255, 255, 255, 0.6);
+  color: var(--primary);
   font-weight: 700;
 }
 
@@ -90,13 +92,16 @@
 }
 
 .retryBtn {
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
   padding: 10px 24px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
 }
 
 .chartHeadRow {
@@ -107,22 +112,23 @@
 }
 
 .reportBtn {
-  padding: 6px 12px;
-  background: linear-gradient(165deg, #1e1535 0%, #150f2a 100%);
-  border: 1px solid rgba(167, 139, 250, 0.25);
-  border-radius: 10px;
+  padding: 7px 12px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1.5px solid rgba(139, 92, 246, 0.4);
+  border-radius: 12px;
   color: #a78bfa;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: border-color 0.15s;
+  transition: all 0.15s;
 }
 
 .reportBtn:active {
-  border-color: rgba(167, 139, 250, 0.6);
+  background: rgba(139, 92, 246, 0.25);
+  border-color: rgba(139, 92, 246, 0.6);
 }
 
 /* ── Content ── */
@@ -606,15 +612,20 @@
 }
 
 .logWeightBtn {
-  background: var(--primary-soft);
-  border: 1px solid var(--primary);
-  color: var(--primary);
-  border-radius: 8px;
-  padding: 5px 12px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 12px;
+  padding: 6px 14px;
   font-size: 0.82rem;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   font-family: inherit;
+  transition: all 0.15s;
+}
+
+.logWeightBtn:active {
+  background: var(--surface-3);
 }
 
 .weightEmpty {
@@ -686,7 +697,7 @@
 
 .weightPeriodActive {
   background: var(--primary-soft);
-  border-color: var(--primary);
+  border-color: rgba(255, 255, 255, 0.6);
   color: var(--primary);
 }
 
@@ -796,7 +807,7 @@
 }
 
 .weightInputWrap:focus-within {
-  border-color: var(--primary);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .weightInput {
@@ -836,20 +847,21 @@
 }
 
 .weightDateInput:focus {
-  border-color: var(--primary);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .weightSaveBtn {
   width: 100%;
-  padding: 14px;
-  background: var(--primary);
-  color: #000;
+  padding: 13px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #05070c;
   border: none;
   border-radius: 12px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
+  transition: opacity 0.15s;
 }
 
 .weightSaveBtn:disabled {

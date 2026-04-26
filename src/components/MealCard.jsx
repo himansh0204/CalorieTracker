@@ -33,11 +33,24 @@ export default function MealCard({ meal }) {
   const [error, setError] = useState('')
 
   function setField(key, val) {
+    if (key !== 'name' && val !== '') {
+      const n = Number(val)
+      if (n < 0) return
+      const max = key === 'calories' ? 9999 : 999
+      if (n > max) return
+    }
     setForm(f => ({ ...f, [key]: val }))
   }
 
   async function handleSave() {
-    if (!form.name.trim()) return
+    if (!form.name.trim()) {
+      showToast('Please enter a meal name', { type: 'error' })
+      return
+    }
+    if (Number(form.calories) < 0 || Number(form.protein) < 0 || Number(form.carbs) < 0 || Number(form.fat) < 0) {
+      showToast('Please enter correct values — no negatives', { type: 'error' })
+      return
+    }
     setSaving(true)
     setError('')
     try {
@@ -150,17 +163,18 @@ export default function MealCard({ meal }) {
 
               {error && <p className={styles.errorMsg}>⚠️ {error}</p>}
 
-              <button
-                className={styles.saveBtn}
-                onClick={handleSave}
-                disabled={saving || !form.name.trim()}
-              >
-                {saving ? 'Saving…' : 'Save changes'}
-              </button>
-
-              <button className={styles.deleteBtn} onClick={handleDelete}>
-                Delete meal
-              </button>
+              <div className={styles.actionRow}>
+                <button
+                  className={styles.saveBtn}
+                  onClick={handleSave}
+                  disabled={saving || !form.name.trim()}
+                >
+                  {saving ? 'Saving…' : 'Edit'}
+                </button>
+                <button className={styles.deleteBtn} onClick={handleDelete}>
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
         </div>

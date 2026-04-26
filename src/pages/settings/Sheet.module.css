@@ -92,37 +92,43 @@
 
 .primaryBtn {
   width: 100%;
-  padding: 14px;
-  background: var(--primary);
-  color: #0a0c10;
+  padding: 13px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #05070c;
   border: none;
   border-radius: 12px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
+  transition: opacity 0.15s;
 }
 
 .primaryBtn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .dangerBtn {
   width: 100%;
-  padding: 14px;
-  background: #ef4444;
+  padding: 13px;
+  background: #c0392bbd;
   color: #fff;
   border: none;
   border-radius: 12px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
+  transition: opacity 0.15s;
+}
+
+.dangerBtn:active {
+  opacity: 0.85;
 }
 
 .dangerBtn:disabled {
-  opacity: 0.6;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 

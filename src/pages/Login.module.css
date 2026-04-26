@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(circle at 18% 0%, rgba(212, 176, 106, 0.2), transparent 44%),
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.1), transparent 44%),
     radial-gradient(circle at 88% 12%, rgba(67, 88, 130, 0.22), transparent 40%),
     #05070c;
   padding: 24px;
@@ -65,9 +65,9 @@
   gap: 10px;
   width: 100%;
   padding: 14px 20px;
-  border: 1.5px solid rgba(212, 176, 106, 0.4);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
-  background: rgba(212, 176, 106, 0.08);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--text);
   font-size: 0.95rem;
   font-weight: 600;
@@ -76,8 +76,8 @@
 }
 
 .googleBtn:hover {
-  background: rgba(212, 176, 106, 0.16);
-  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .googleBtnWrapper {

@@ -230,20 +230,20 @@
   justify-content: center;
   gap: 8px;
   width: 100%;
-  padding: 15px;
-  background: var(--surface);
-  border: 1px solid var(--border-soft);
-  border-radius: 16px;
-  color: var(--text);
-  font-size: 1rem;
+  padding: 13px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: var(--shadow-card);
-  transition: background 0.15s;
+  font-family: inherit;
+  transition: all 0.15s;
 }
 
 .logoutBtn:active {
-  background: var(--surface-2);
+  background: var(--surface-3);
 }
 
 .version {

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
-import { localDateStr } from '../../utils/dates'
+import { localDateStr, localYesterdayStr } from '../../utils/dates'
 import { useAuth } from '../../context/AuthContext'
 import { useFoodLog } from '../../context/FoodLogContext'
+import MealCard from '../../components/MealCard'
 import EmptyMealState from '../../components/EmptyMealState'
-import { SkeletonHistoryRow } from '../../components/Skeleton'
-import HistoryDayRow from './HistoryDayRow'
+import { SkeletonMealCard } from '../../components/Skeleton'
 import styles from './history.module.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '/api'
@@ -15,84 +15,76 @@ async function apiFetch(path) {
   return res.json()
 }
 
+function formatDateLabel(str) {
+  const today = localDateStr()
+  const yesterday = localYesterdayStr()
+  if (str === today) return 'Today'
+  if (str === yesterday) return 'Yesterday'
+  return new Date(str).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
+}
+
 export default function History() {
   const { user } = useAuth()
   const { mealsVersion, hiddenMealIds } = useFoodLog()
 
-  const [dates, setDates] = useState([])
-  const [expanded, setExpanded] = useState(null)
-  const [mealsCache, setMealsCache] = useState({})
+  const [meals, setMeals] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!user) return
     const end = localDateStr()
-    const d = new Date(); d.setDate(d.getDate() - 30)
+    const d = new Date(); d.setDate(d.getDate() - 7)
     const start = localDateStr(d)
     apiFetch(`/meals?startDate=${start}&endDate=${end}`)
       .then((data) => {
-        const uniqueDates = [...new Set((data.meals || []).map((m) => localDateStr(new Date(m.logged_at))))]
-          .sort((a, b) => b.localeCompare(a))
-        setDates(uniqueDates)
-        const grouped = {}
-        for (const meal of data.meals || []) {
-          const d = localDateStr(new Date(meal.logged_at))
-          if (!grouped[d]) grouped[d] = []
-          grouped[d].push(meal)
-        }
-        setMealsCache(grouped)
+        const sorted = (data.meals || []).sort(
+          (a, b) => new Date(b.logged_at) - new Date(a.logged_at)
+        )
+        setMeals(sorted)
       })
       .finally(() => setLoading(false))
   }, [user, mealsVersion])
 
-  async function toggle(date) {
-    if (expanded === date) { setExpanded(null); return }
-    setExpanded(date)
-    if (!mealsCache[date]) {
-      const data = await apiFetch(`/meals?startDate=${date}&endDate=${date}`)
-      setMealsCache((c) => ({ ...c, [date]: data.meals || [] }))
-    }
-  }
+  const visibleMeals = meals.filter((m) => !hiddenMealIds.has(m.id))
 
-  const visibleDates = dates
-    .map((date) => ({
-      date,
-      meals: (mealsCache[date] || []).filter((m) => !hiddenMealIds.has(m.id)),
-    }))
-    .filter(({ meals }) => meals.length > 0)
+  // Group into date sections for separators
+  const sections = []
+  let lastDate = null
+  for (const meal of visibleMeals) {
+    const date = localDateStr(new Date(meal.logged_at))
+    if (date !== lastDate) {
+      sections.push({ type: 'date', date, key: `sep-${date}` })
+      lastDate = date
+    }
+    sections.push({ type: 'meal', meal, key: `meal-${meal.id}` })
+  }
 
   return (
     <div className={styles.page}>
       <h1 className={styles.pageTitle}>History</h1>
 
       {loading && (
-        <ul className={styles.list}>
-          {[1, 2, 3, 4, 5].map(i => (
-            <li key={i} className={styles.item}>
-              <SkeletonHistoryRow />
-            </li>
-          ))}
-        </ul>
+        <div className={styles.list}>
+          {[1, 2, 3, 4].map(i => <SkeletonMealCard key={i} />)}
+        </div>
       )}
 
-      {!loading && visibleDates.length === 0 && (
+      {!loading && visibleMeals.length === 0 && (
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '16px' }}>
           <EmptyMealState />
         </div>
       )}
 
-      {!loading && visibleDates.length > 0 && (
-        <ul className={styles.list}>
-          {visibleDates.map(({ date, meals }) => (
-            <HistoryDayRow
-              key={date}
-              date={date}
-              meals={meals}
-              isOpen={expanded === date}
-              onToggle={() => toggle(date)}
-            />
-          ))}
-        </ul>
+      {!loading && visibleMeals.length > 0 && (
+        <div className={styles.list}>
+          {sections.map(item =>
+            item.type === 'date' ? (
+              <p key={item.key} className={styles.dateSeparator}>{formatDateLabel(item.date)}</p>
+            ) : (
+              <MealCard key={item.key} meal={item.meal} />
+            )
+          )}
+        </div>
       )}
     </div>
   )

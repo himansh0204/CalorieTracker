@@ -118,7 +118,7 @@
 
 .input:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .input::placeholder {
@@ -134,21 +134,22 @@
 
 .pill {
   flex: 1;
-  padding: 12px;
+  padding: 10px;
   border: 1.5px solid var(--border);
-  border-radius: 12px;
-  background: var(--bg);
+  border-radius: 10px;
+  background: var(--surface-2);
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  font-family: inherit;
+  transition: all 0.15s;
 }
 
 .pillActive {
-  border-color: var(--primary);
+  border-color: rgba(255, 255, 255, 0.6);
   color: var(--primary);
-  background: rgba(212, 176, 106, 0.1);
+  background: var(--primary-soft);
 }
 
 /* Activity list */
@@ -173,8 +174,8 @@
 }
 
 .activityOptionActive {
-  border-color: var(--primary);
-  background: rgba(212, 176, 106, 0.08);
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .activityLabel {
@@ -202,7 +203,7 @@
 }
 
 .fireIcon {
-  font-size: 1.8rem;
+  font-size: 2.2rem;
 }
 
 .calorieNum {
@@ -261,32 +262,34 @@
 }
 
 .backBtn {
-  padding: 14px 20px;
-  background: none;
+  padding: 13px 20px;
+  background: var(--surface-2);
   border: 1.5px solid var(--border);
   border-radius: 12px;
   color: var(--text-muted);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
+  font-family: inherit;
   flex-shrink: 0;
-  transition: border-color 0.15s;
+  transition: all 0.15s;
 }
 
-.backBtn:hover {
-  border-color: var(--text-muted);
+.backBtn:active {
+  background: var(--surface-3);
 }
 
 .nextBtn {
   flex: 1;
-  padding: 14px;
-  background: var(--primary);
-  color: #fff;
+  padding: 13px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #05070c;
   border: none;
   border-radius: 12px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
+  font-family: inherit;
   transition: opacity 0.15s;
 }
 

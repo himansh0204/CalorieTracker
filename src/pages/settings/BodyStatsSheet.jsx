@@ -3,6 +3,7 @@ import Sheet from './Sheet'
 import sheetStyles from './Sheet.module.css'
 import styles from './BodyStatsSheet.module.css'
 import { ACTIVITY_OPTIONS, calcGoals } from './settingsConstants'
+import { useToast } from '../../context/ToastContext'
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
@@ -17,13 +18,31 @@ export default function BodyStatsSheet({ settings, onClose, onSaved }) {
   })
   const [saving, setSaving] = useState(false)
   const [error, setError]   = useState(null)
+  const { showToast } = useToast()
 
   const goals   = calcGoals(form)
   const canSave = form.gender && form.age && form.heightCm && form.weightKg
 
-  function set(key, val) { setForm(f => ({ ...f, [key]: val })) }
+  const BOUNDS = { age: [1, 120], heightCm: [50, 272], weightKg: [10, 500], goalWeightKg: [10, 500] }
+  function set(key, val) {
+    if (BOUNDS[key] && val !== '') {
+      const n = Number(val)
+      if (isNaN(n) || n < 0) return
+      if (n > BOUNDS[key][1]) return
+    }
+    setForm(f => ({ ...f, [key]: val }))
+  }
 
   async function handleSave() {
+    if (!form.gender) { showToast('Please select a gender', { type: 'error' }); return }
+    const age = Number(form.age), h = Number(form.heightCm), w = Number(form.weightKg)
+    if (!form.age || age < 1 || age > 120) { showToast('Please enter a valid age (1–120)', { type: 'error' }); return }
+    if (!form.heightCm || h < 50 || h > 272) { showToast('Please enter a valid height (50–272 cm)', { type: 'error' }); return }
+    if (!form.weightKg || w < 10 || w > 500) { showToast('Please enter a valid weight (10–500 kg)', { type: 'error' }); return }
+    if (form.goalWeightKg) {
+      const gw = Number(form.goalWeightKg)
+      if (gw < 10 || gw > 500) { showToast('Please enter a valid goal weight (10–500 kg)', { type: 'error' }); return }
+    }
     setSaving(true)
     setError(null)
     try {

@@ -33,7 +33,7 @@
 
 .formInput:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .pillRow {
@@ -47,7 +47,7 @@
   background: var(--surface-2);
   border: 1.5px solid var(--border);
   border-radius: 10px;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
@@ -57,7 +57,7 @@
 
 .pillActive {
   background: var(--primary-soft);
-  border-color: var(--primary);
+  border-color: rgba(255, 255, 255, 0.6);
   color: var(--primary);
 }
 
@@ -83,8 +83,8 @@
 }
 
 .activityOptionActive {
-  background: var(--primary-soft);
-  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .activityLabel {
@@ -94,7 +94,7 @@
 }
 
 .activityOptionActive .activityLabel {
-  color: var(--primary);
+  color: #fff;
 }
 
 .activityDesc {
@@ -134,7 +134,7 @@
 .goalVal {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--text);
 }
 
 .goalLabel {

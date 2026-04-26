@@ -74,7 +74,15 @@ export default function AddMeal() {
   }
 
   async function handleLog() {
-    if (!mealName.trim()) return
+    if (!mealName.trim()) {
+      showToast('Please enter a meal name', { type: 'error' })
+      return
+    }
+    const vals = [nutrients.calories, nutrients.protein, nutrients.carbs, nutrients.fat]
+    if (vals.some(v => v === '' || Number(v) < 0)) {
+      showToast('Please enter correct values — no negatives', { type: 'error' })
+      return
+    }
     setSaving(true)
     try {
       await logMeal({
@@ -95,6 +103,12 @@ export default function AddMeal() {
   }
 
   function setField(field, val) {
+    if (val !== '') {
+      const n = Number(val)
+      if (n < 0) return
+      const max = field === 'calories' ? 9999 : 999
+      if (n > max) return
+    }
     setNutrients((prev) => ({ ...prev, [field]: val }))
   }
 

@@ -60,12 +60,7 @@
 /* ---------- Streak pill (in header) ---------- */
 .streakPill {
   display: flex;
-  align-items: center;
   gap: 4px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
-  padding: 5px 10px 5px 8px;
   font-size: 0.9rem;
 }
 
@@ -254,9 +249,6 @@
 .cardLabel {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
 }
 
 .cardIcon {
@@ -274,11 +266,12 @@
 }
 
 .ring {
-  width: clamp(88px, 30vw, 118px);
-  height: clamp(88px, 30vw, 118px);
+  width: clamp(130px, 42vw, 170px);
+  height: clamp(130px, 42vw, 170px);
   border-radius: 50%;
   background: conic-gradient(
-    var(--color, var(--primary)) calc(var(--pct, 0) * 3.6deg),
+    var(--color-start, var(--primary)) 0deg,
+    var(--color-end, var(--primary)) calc(var(--pct, 0) * 3.6deg),
     rgba(255,255,255,0.07) 0deg
   );
   display: flex;
@@ -290,7 +283,7 @@
 .ring::before {
   content: '';
   position: absolute;
-  inset: clamp(8px, 2.5vw, 11px);
+  inset: clamp(5px, 1.5vw, 7px);
   border-radius: 50%;
   background: var(--surface-2);
 }
@@ -301,11 +294,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
+  gap: 3px;
 }
 
 .ringCal {
-  font-size: clamp(1.1rem, 5.5vw, 1.6rem);
+  font-size: clamp(1.4rem, 6.5vw, 2rem);
   font-weight: 800;
   color: var(--text);
   line-height: 1;
@@ -314,13 +307,13 @@
 .ringCal.over { color: #ef4444; }
 
 .ringGoal {
-  font-size: 0.62rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
   font-weight: 600;
 }
 
 .ringLeft {
-  font-size: 0.6rem;
+  font-size: 0.68rem;
   color: var(--text-muted);
 }
 
@@ -603,17 +596,8 @@
 
 /* ── Responsive: content-based breakpoint where layout needs help ── */
 @media (max-width: 400px) {
-  .actionCard {
-    padding: 8px 5px;
-    min-height: 76px;
-  }
-
-  .actionTitle {
-    font-size: clamp(0.72rem, 3.2vw, 0.82rem);
-  }
-
-  .actionSub {
-    font-size: clamp(0.6rem, 2.5vw, 0.7rem);
+  .quickActions {
+    display: none;
   }
 
   .sheetBody {

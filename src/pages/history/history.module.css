@@ -7,6 +7,14 @@
   padding-bottom: calc(80px + env(safe-area-inset-bottom));
 }
 
+.pageTitle {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text);
+  padding: 24px 20px 8px;
+  flex-shrink: 0;
+}
+
 .empty {
   text-align: center;
   color: var(--text-muted);

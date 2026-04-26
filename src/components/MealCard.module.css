@@ -24,8 +24,10 @@
 }
 
 .thumbEmoji {
-  font-size: 1.5rem;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
 }
 
 .info {
@@ -74,8 +76,6 @@
 
 .calories {
   font-size: 0.82rem;
-  font-weight: 800;
-  color: var(--primary);
 }
 
 .macros {
@@ -84,6 +84,18 @@
   font-size: 0.7rem;
   color: var(--text-muted);
   font-weight: 600;
+}
+
+.macros span {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.macroDivider {
+  color: var(--border);
+  font-weight: 400;
+  font-size: 0.65rem;
 }
 
 .editBtn {

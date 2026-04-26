@@ -1,5 +1,6 @@
 import { localDateStr, localYesterdayStr } from '../../utils/dates'
 import styles from './history.module.css'
+import { CalorieIcon, ProteinIcon, CarbsIcon, FatIcon } from '../../components/NutrientIcons'
 
 function getMealStyle(meal) {
   const type = meal.meal_type || meal.mealType
@@ -38,7 +39,7 @@ export default function HistoryDayRow({ date, meals, isOpen, onToggle }) {
         </div>
         {totals && (
           <div className={styles.dayRight}>
-            <span className={styles.calTotal}>🔥 {Math.round(totals.calories)}</span>
+            <span className={styles.calTotal}><CalorieIcon /> {Math.round(totals.calories)}</span>
             <span className={styles.mealCount}>{meals.length} meal{meals.length !== 1 ? 's' : ''}</span>
           </div>
         )}
@@ -48,9 +49,9 @@ export default function HistoryDayRow({ date, meals, isOpen, onToggle }) {
       {isOpen && meals && (
         <div className={styles.detail}>
           <div className={styles.macroSummary}>
-            <span>💪 {Math.round(totals.protein)}g protein</span>
-            <span>🌾 {Math.round(totals.carbs)}g carbs</span>
-            <span>🥑 {Math.round(totals.fat)}g fat</span>
+            <span><ProteinIcon /> {Math.round(totals.protein)}g protein</span>
+            <span><CarbsIcon /> {Math.round(totals.carbs)}g carbs</span>
+            <span><FatIcon /> {Math.round(totals.fat)}g fat</span>
           </div>
           {meals.map((m) => {
             const { emoji, color } = getMealStyle(m)

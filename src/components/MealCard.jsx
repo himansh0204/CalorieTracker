@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useFoodLog } from '../context/FoodLogContext'
 import { useToast } from '../context/ToastContext'
 import styles from './MealCard.module.css'
+import { CalorieIcon, ProteinIcon, CarbsIcon, FatIcon } from './NutrientIcons'
+import { getMealIcon } from './MealIcons'
 
 function timeAgo(isoStr) {
   if (!isoStr) return ''
@@ -14,26 +16,10 @@ function timeAgo(isoStr) {
   return new Date(isoStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-const TimeIcons = {
-  morning:   '🍳',
-  afternoon: '🥗',
-  evening:   '🍜',
-  night:     '🍽️',
-}
-
-function getMealStyle(meal) {
-  const hour = meal.logged_at ? new Date(meal.logged_at).getHours() : 12
-  if (hour >= 5  && hour < 12) return 'morning'
-  if (hour >= 12 && hour < 17) return 'afternoon'
-  if (hour >= 17 && hour < 20) return 'evening'
-  return 'night'
-}
-
 export default function MealCard({ meal }) {
   const { updateMeal, scheduleRemoveMeal, undoRemoveMeal } = useFoodLog()
   const { showToast } = useToast()
   const name = meal.food_name || meal.name || 'Meal'
-  const timeSlot = getMealStyle(meal)
 
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({
@@ -86,7 +72,7 @@ export default function MealCard({ meal }) {
     <>
       <div className={styles.card}>
         <div className={styles.thumb}>
-          <span className={styles.thumbEmoji}>{TimeIcons[timeSlot]}</span>
+          <span className={styles.thumbEmoji}>{getMealIcon(meal.meal_type || meal.mealType)}</span>
         </div>
 
         <div className={styles.info}>
@@ -97,13 +83,15 @@ export default function MealCard({ meal }) {
             )}
           </div>
           <div className={styles.calRow}>
-            <span className={styles.calFire}>🔥</span>
+            <span className={styles.calFire}><CalorieIcon /></span>
             <span className={styles.calories}>{Math.round(meal.calories)} kcal</span>
           </div>
           <div className={styles.macros}>
-            <span>💪 {Math.round(meal.protein)}g</span>
-            <span>🌾 {Math.round(meal.carbs)}g</span>
-            <span>🥑 {Math.round(meal.fat)}g</span>
+            <span><ProteinIcon /> {Math.round(meal.protein)}g</span>
+            <span className={styles.macroDivider}>|</span>
+            <span><CarbsIcon /> {Math.round(meal.carbs)}g</span>
+            <span className={styles.macroDivider}>|</span>
+            <span><FatIcon /> {Math.round(meal.fat)}g</span>
           </div>
         </div>
 

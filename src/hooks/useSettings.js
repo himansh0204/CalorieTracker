@@ -22,7 +22,7 @@ const API_BASE = import.meta.env.VITE_API_URL || '/api'
 export function useSettings() {
   const { user } = useAuth()
   const [settings, setSettings] = useState(DEFAULTS)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const key = localKey(user?.id)
 
   const fetchSettings = useCallback(async () => {

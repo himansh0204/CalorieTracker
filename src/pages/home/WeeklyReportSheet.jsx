@@ -1,6 +1,6 @@
 import styles from './home.module.css'
 
-export default function WeeklyReportSheet({ state, text, onClose, onRetry }) {
+export default function WeeklyReportSheet({ state, text, onClose, onRetry, title = 'Weekly Report' }) {
   if (state === 'closed') return null
 
   return (
@@ -8,14 +8,14 @@ export default function WeeklyReportSheet({ state, text, onClose, onRetry }) {
       <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
         <div className={styles.sheetHandle} />
         <div className={styles.sheetHeader}>
-          <h2 className={styles.sheetTitle}>✨ Weekly Report</h2>
+          <h2 className={styles.sheetTitle}>✨ {title}</h2>
           <button className={styles.sheetClose} onClick={onClose}>✕</button>
         </div>
 
         {state === 'loading' && (
           <div className={styles.sheetLoading}>
             <div className={styles.sheetSpinner} />
-            <p>Analysing your week…</p>
+            <p>Analysing your data…</p>
           </div>
         )}
 

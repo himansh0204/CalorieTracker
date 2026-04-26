@@ -113,19 +113,62 @@ router.get('/summary', verifyToken, async (req, res) => {
   }
 })
 
-// Generate weekly AI report
+// Generate AI report (supports ?period=week|last-week|month, defaults to week)
 router.get('/weekly-report', verifyToken, async (req, res) => {
   try {
     const userId = req.userId
+    const period = req.query.period || 'week'
 
     if (!await checkLimit(weeklyReportLimiter, String(userId))) {
       return res.status(429).json({ error: 'Too many requests. Please wait before generating another report.' })
     }
 
-    // Last 7 days per-day totals + meal names
+    // Compute date range matching the /progress endpoint logic
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    function getMonday(d) {
+      const day = d.getDay()
+      const diff = (day === 0 ? -6 : 1 - day)
+      const mon = new Date(d)
+      mon.setDate(d.getDate() + diff)
+      return mon
+    }
+
+    const toLocalDateStr = (d) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
+    let startDate, endDate, periodLabel, daysInPeriod
+
+    if (period === 'last-week') {
+      const thisMonday = getMonday(today)
+      startDate = new Date(thisMonday)
+      startDate.setDate(thisMonday.getDate() - 7)
+      endDate = new Date(startDate)
+      endDate.setDate(startDate.getDate() + 6)
+      periodLabel = 'last week'
+      daysInPeriod = 7
+    } else if (period === 'month') {
+      startDate = new Date(today.getFullYear(), today.getMonth(), 1)
+      endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+      periodLabel = 'this month'
+      daysInPeriod = endDate.getDate()
+    } else {
+      // default: current week
+      startDate = getMonday(today)
+      endDate = new Date(startDate)
+      endDate.setDate(startDate.getDate() + 6)
+      periodLabel = 'this week'
+      daysInPeriod = 7
+    }
+
+    const startStr = toLocalDateStr(startDate)
+    const endStr   = toLocalDateStr(endDate)
+
+    // Per-day totals + meal names for the period
     const weekRes = await query(
       `SELECT
-        DATE(logged_at) as date,
+        TO_CHAR(DATE(logged_at), 'YYYY-MM-DD') as date,
         COALESCE(SUM(calories), 0) as calories,
         COALESCE(SUM(protein), 0)  as protein,
         COALESCE(SUM(carbs), 0)    as carbs,
@@ -133,10 +176,10 @@ router.get('/weekly-report', verifyToken, async (req, res) => {
         COUNT(*) as meal_count,
         STRING_AGG(food_name, ', ' ORDER BY logged_at) as meals
        FROM meals
-       WHERE user_id = $1 AND logged_at >= NOW() - INTERVAL '7 days'
+       WHERE user_id = $1 AND DATE(logged_at) BETWEEN $2 AND $3
        GROUP BY DATE(logged_at)
        ORDER BY date ASC`,
-      [userId]
+      [userId, startStr, endStr]
     )
 
     // User goals
@@ -150,7 +193,7 @@ router.get('/weekly-report', verifyToken, async (req, res) => {
     const days = weekRes.rows
 
     if (days.length === 0) {
-      return res.json({ ok: true, report: "No meals logged in the past 7 days. Start tracking your meals to get a personalised weekly report!" })
+      return res.json({ ok: true, report: `No meals logged for ${periodLabel}. Start tracking your meals to get a personalised report!` })
     }
 
     const avgCalories = Math.round(days.reduce((s, d) => s + Number(d.calories), 0) / days.length)
@@ -162,22 +205,24 @@ router.get('/weekly-report', verifyToken, async (req, res) => {
       `${d.date}: ${Math.round(d.calories)} kcal | P:${Math.round(d.protein)}g C:${Math.round(d.carbs)}g F:${Math.round(d.fat)}g | Meals: ${d.meals}`
     ).join('\n')
 
-    const prompt = `You are a friendly nutrition coach. Analyse the user's past 7 days of eating and write a concise weekly report.
+    const focusLabel = period === 'month' ? "This Month's Focus" : period === 'last-week' ? "Next Week's Focus" : "This Week's Focus"
+
+    const prompt = `You are a friendly nutrition coach. Analyse the user's eating for ${periodLabel} and write a concise report.
 
 USER GOALS: ${goals.calorie_goal} kcal/day | Protein ${goals.protein_goal}g | Carbs ${goals.carbs_goal}g | Fat ${goals.fat_goal}g
 
 DAILY DATA:
 ${daysSummary}
 
-WEEKLY AVERAGES: ${avgCalories} kcal | Protein ${avgProtein}g | Carbs ${avgCarbs}g | Fat ${avgFat}g
-Days tracked: ${days.length}/7
+AVERAGES: ${avgCalories} kcal | Protein ${avgProtein}g | Carbs ${avgCarbs}g | Fat ${avgFat}g
+Days tracked: ${days.length}/${daysInPeriod}
 
-Write the report in this exact structure (use these headings):
+Write the report in this exact structure (use these exact headings):
 ## Overview
 2-3 sentences on overall calorie adherence and consistency.
 
 ## Highlights
-2 positive things the user did well this week (bullet points).
+2 positive things the user did well (bullet points).
 
 ## Areas to Improve
 2 specific, actionable suggestions (bullet points).
@@ -185,8 +230,8 @@ Write the report in this exact structure (use these headings):
 ## Macro Balance
 One sentence each on protein, carbs, and fat intake vs goals.
 
-## This Week's Focus
-One clear, motivating goal for the coming week.
+## ${focusLabel}
+One clear, motivating goal going forward.
 
 Keep the tone warm, encouraging, and specific. Total length: around 150-200 words.`
 

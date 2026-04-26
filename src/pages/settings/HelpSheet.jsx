@@ -9,7 +9,7 @@ export default function HelpSheet({ onClose }) {
         <div className={styles.section}>
           <p className={styles.heading}>Contact Us</p>
           <p className={styles.text}>Having an issue or want to share feedback? Reach out at:</p>
-          <p className={styles.email}>support@calqube.app</p>
+          <p className={styles.email}>calqube.support@gmail.com</p>
         </div>
         <div className={styles.section}>
           <p className={styles.heading}>FAQ</p>

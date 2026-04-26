@@ -14,7 +14,7 @@ const PRIVACY_CONTENT = (
     <p className={styles.heading}>Data Deletion</p>
     <p className={styles.text}>You can permanently delete your account and all associated data at any time from Settings → Delete Account. Deletion is immediate and irreversible.</p>
     <p className={styles.heading}>Contact</p>
-    <p className={styles.text}>For privacy-related questions, contact us at support@calqube.app.</p>
+    <p className={styles.text}>For privacy-related questions, contact us at calqube.support@gmail.com.</p>
   </div>
 )
 
@@ -32,7 +32,7 @@ const TERMS_CONTENT = (
     <p className={styles.heading}>Changes to Terms</p>
     <p className={styles.text}>We may update these terms at any time. Continued use of the app after changes constitutes acceptance of the revised terms.</p>
     <p className={styles.heading}>Contact</p>
-    <p className={styles.text}>Questions about these terms? Email support@calqube.app.</p>
+    <p className={styles.text}>Questions about these terms? Email calqube.support@gmail.com.</p>
   </div>
 )
 

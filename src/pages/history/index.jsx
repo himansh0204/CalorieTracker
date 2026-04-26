@@ -2,11 +2,8 @@ import { useState, useEffect } from 'react'
 import { localDateStr } from '../../utils/dates'
 import { useAuth } from '../../context/AuthContext'
 import { useFoodLog } from '../../context/FoodLogContext'
-import PageHeader from '../../components/PageHeader'
 import EmptyMealState from '../../components/EmptyMealState'
 import { SkeletonHistoryRow } from '../../components/Skeleton'
-
-import { IconHistory } from '../../components/icons'
 import HistoryDayRow from './HistoryDayRow'
 import styles from './history.module.css'
 
@@ -66,7 +63,7 @@ export default function History() {
 
   return (
     <div className={styles.page}>
-      <PageHeader title="History" icon={IconHistory} />
+      <h1 className={styles.pageTitle}>History</h1>
 
       {loading && (
         <ul className={styles.list}>

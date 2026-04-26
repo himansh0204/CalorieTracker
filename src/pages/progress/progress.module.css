@@ -7,6 +7,14 @@
   padding-bottom: calc(80px + env(safe-area-inset-bottom));
 }
 
+.pageTitle {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text);
+  padding: 24px 20px 8px;
+  flex-shrink: 0;
+}
+
 .header {
   padding: 14px 16px 8px;
   flex-shrink: 0;
@@ -89,6 +97,32 @@
   padding: 10px 24px;
   font-size: 0.9rem;
   cursor: pointer;
+}
+
+.chartHeadRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.reportBtn {
+  padding: 6px 12px;
+  background: linear-gradient(165deg, #1e1535 0%, #150f2a 100%);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  border-radius: 10px;
+  color: #a78bfa;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+
+.reportBtn:active {
+  border-color: rgba(167, 139, 250, 0.6);
 }
 
 /* ── Content ── */

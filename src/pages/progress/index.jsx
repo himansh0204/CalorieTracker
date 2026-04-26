@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
-import PageHeader from '../../components/PageHeader'
 import EmptyMealState from '../../components/EmptyMealState'
 import { useTotalMeals } from '../../hooks/useTotalMeals'
-import { IconProgress } from '../../components/icons'
 import ProgressChart, { groupIntoWeeks, FAT_COLOR, CARBS_COLOR, PROTEIN_COLOR } from './ProgressChart'
 import BMICard from './BMICard'
 import CalendarCard from './CalendarCard'
+import WeeklyReportSheet from '../home/WeeklyReportSheet'
 import styles from './progress.module.css'
+import { CalorieIcon } from '../../components/NutrientIcons'
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
@@ -18,10 +18,12 @@ const PERIODS = [
 
 export default function Progress() {
   const totalMeals = useTotalMeals()
-  const [period, setPeriod]     = useState('week')
-  const [data, setData]         = useState(null)
-  const [loading, setLoading]   = useState(true)
-  const [error, setError]       = useState('')
+  const [period, setPeriod]       = useState('week')
+  const [data, setData]           = useState(null)
+  const [loading, setLoading]     = useState(true)
+  const [error, setError]         = useState('')
+  const [reportState, setReportState] = useState('closed')
+  const [reportText, setReportText]   = useState('')
 
   useEffect(() => {
     async function load() {
@@ -46,9 +48,26 @@ export default function Progress() {
   const chartDays = data ? (period === 'month' ? groupIntoWeeks(data.days) : data.days) : []
   const noData = totalMeals === 0
 
+  const PERIOD_LABELS = { week: 'Week Report', 'last-week': 'Last Week Report', month: 'Month Report' }
+
+  async function openReport() {
+    setReportState('loading')
+    try {
+      const res = await fetch(`${API_BASE}/analytics/weekly-report?period=${period}`, {
+        credentials: 'include',
+      })
+      const json = await res.json()
+      if (!res.ok || !json.ok) throw new Error(json.error || 'Failed to generate report')
+      setReportText(json.report)
+      setReportState('open')
+    } catch {
+      setReportState('error')
+    }
+  }
+
   return (
     <div className={styles.page}>
-      <PageHeader title="Progress" icon={IconProgress} />
+      <h1 className={styles.pageTitle}>Progress</h1>
 
       {loading ? (
         <div className={styles.loadingWrap}>
@@ -67,7 +86,10 @@ export default function Progress() {
         <>
           <div className={styles.content}>
             <div className={styles.chartCard}>
-              <p className={styles.sectionHeading}>Nutrition Analytics</p>
+              <div className={styles.chartHeadRow}>
+                <p className={styles.sectionHeading}>Nutrition Analytics</p>
+                <button className={styles.reportBtn} onClick={openReport}>✨ AI Insights</button>
+              </div>
               <div className={styles.periodRow}>
                 {PERIODS.map(p => (
                   <button
@@ -80,7 +102,7 @@ export default function Progress() {
                 ))}
               </div>
               <div className={styles.totalRow}>
-                <span className={styles.fireIcon}>🔥</span>
+                <span className={styles.fireIcon}><CalorieIcon /></span>
                 <span className={styles.totalKcal}>{data.totalCalories.toLocaleString()}</span>
                 <span className={styles.kcalLabel}>kcal</span>
               </div>
@@ -106,6 +128,14 @@ export default function Progress() {
           </div>
         </>
       ) : null}
+
+      <WeeklyReportSheet
+        state={reportState}
+        text={reportText}
+        title={PERIOD_LABELS[period]}
+        onClose={() => setReportState('closed')}
+        onRetry={openReport}
+      />
     </div>
   )
 }

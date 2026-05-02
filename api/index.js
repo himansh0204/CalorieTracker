@@ -25,6 +25,7 @@ app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true)
     if (ALLOWED_ORIGINS.has(origin)) return callback(null, true)
+    if (origin.endsWith('.vercel.app')) return callback(null, true)
     return callback(Object.assign(new Error('Not allowed by CORS'), { status: 403 }))
   },
   credentials: true,

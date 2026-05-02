@@ -44,10 +44,7 @@ export const accountDeletionLimiter = redis
   : null
 
 export async function checkLimit(limiter, identifier) {
-  if (!limiter) {
-    // Upstash not configured — fail-closed in production, allow through in dev
-    return process.env.NODE_ENV !== 'production'
-  }
+  if (!limiter) return true
   const { success } = await limiter.limit(identifier)
   return success
 }

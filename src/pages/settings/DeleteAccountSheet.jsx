@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import Sheet from './Sheet'
 import sheetStyles from './Sheet.module.css'
-
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
+import { API_BASE } from '../../utils/api.js'
 
 export default function DeleteAccountSheet({ onClose, onDeleted }) {
   const [deleting, setDeleting] = useState(false)

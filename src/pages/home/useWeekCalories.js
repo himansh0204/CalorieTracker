@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
-
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
+import { API_BASE } from '../../utils/api.js'
 
 export function useWeekCalories(mealsVersion) {
   const { user } = useAuth()

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { API_BASE, withTimeout } from '../utils/api.js'
 
 const DEFAULTS = {
   calorieGoal: 2000,
@@ -17,7 +18,6 @@ const DEFAULTS = {
 const SETTINGS_TIMEOUT_MS = 7000
 const LOCAL_KEY_PREFIX = 'caltrack.settings'
 const SETTINGS_UPDATED_EVENT = 'caltrack:settings-updated'
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
 export function useSettings() {
   const { user } = useAuth()
@@ -122,14 +122,6 @@ export function useSettings() {
   return { settings, loading, updateSettings, refetch: fetchSettings, hasOnboarded: settings.hasOnboarded, markOnboarded }
 }
 
-function withTimeout(promise, timeoutMs) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('settings-timeout')), timeoutMs)
-    }),
-  ])
-}
 
 function sanitizeSettings(raw) {
   return {

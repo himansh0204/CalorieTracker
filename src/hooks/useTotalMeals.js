@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
+import { API_BASE } from '../utils/api.js'
 
 export function useTotalMeals() {
   const [totalMeals, setTotalMeals] = useState(null)

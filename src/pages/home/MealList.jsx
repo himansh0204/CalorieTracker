@@ -1,16 +1,15 @@
-import { Link } from 'react-router-dom'
 import { localDateStr, localYesterdayStr } from '../../utils/dates'
 import MealCard from '../../components/MealCard'
 import EmptyMealState from '../../components/EmptyMealState'
 import { SkeletonMealCard } from '../../components/Skeleton'
 import styles from './home.module.css'
 
-export default function MealList({ meals, loading, selectedDate }) {
+export default function MealList({ meals, loading, selectedDate, onReportClick }) {
   return (
     <section className={styles.mealList}>
       <div className={styles.mealHeader}>
         <h2 className={styles.sectionTitle}>{activityTitle(selectedDate)}</h2>
-        <Link to="/history" className={styles.seeAll}>See All</Link>
+        <button className={styles.reportBtn} onClick={onReportClick}>✨ AI Insight</button>
       </div>
       <div className={styles.mealScroll}>
         {loading && (

@@ -4,6 +4,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 
+import { query } from './lib/db.js'
 import authRoutes from './routes/auth.js'
 import mealsRoutes from './routes/meals.js'
 import settingsRoutes from './routes/settings.js'
@@ -11,15 +12,19 @@ import analyticsRoutes from './routes/analytics.js'
 
 const app = express()
 
+const ALLOWED_ORIGINS = new Set([
+  'http://localhost:5173',
+  'http://localhost:3000',
+  process.env.FRONTEND_URL,
+].filter(Boolean))
+
 // Middleware
 app.use(helmet())
 app.use(cookieParser())
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true)
-    if (origin.startsWith('http://localhost:')) return callback(null, true)
-    if (origin.endsWith('.vercel.app')) return callback(null, true)
-    if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) return callback(null, true)
+    if (ALLOWED_ORIGINS.has(origin)) return callback(null, true)
     return callback(Object.assign(new Error('Not allowed by CORS'), { status: 403 }))
   },
   credentials: true,
@@ -28,8 +33,13 @@ app.use(cors({
 app.use(express.json({ limit: '15mb' }))
 
 // Health check
-app.get('/api/health', (req, res) => {
-  res.json({ ok: true, timestamp: new Date().toISOString() })
+app.get('/api/health', async (_req, res) => {
+  try {
+    await query('SELECT 1')
+    res.json({ ok: true, timestamp: new Date().toISOString() })
+  } catch {
+    res.status(503).json({ ok: false, error: 'Database unavailable' })
+  }
 })
 
 // Routes

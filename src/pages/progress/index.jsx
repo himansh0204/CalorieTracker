@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react'
-import EmptyMealState from '../../components/EmptyMealState'
-import { useTotalMeals } from '../../hooks/useTotalMeals'
 import ProgressChart, { groupIntoWeeks, FAT_COLOR, CARBS_COLOR } from './ProgressChart'
 import BMICard from './BMICard'
 import CalendarCard from './CalendarCard'
 import WeeklyReportSheet from '../home/WeeklyReportSheet'
 import styles from './progress.module.css'
 import { CalorieIcon, ProteinIcon, CarbsIcon, FatIcon } from '../../components/NutrientIcons'
-
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
+import { API_BASE } from '../../utils/api.js'
 
 const PERIODS = [
   { key: 'week',      label: 'Week' },
@@ -17,7 +14,6 @@ const PERIODS = [
 ]
 
 export default function Progress() {
-  const totalMeals = useTotalMeals()
   const [period, setPeriod]       = useState('week')
   const [data, setData]           = useState(null)
   const [loading, setLoading]     = useState(true)
@@ -46,7 +42,6 @@ export default function Progress() {
   }, [period])
 
   const chartDays = data ? (period === 'month' ? groupIntoWeeks(data.days) : data.days) : []
-  const noData = totalMeals === 0
 
   const PERIOD_LABELS = { week: 'Week Report', 'last-week': 'Last Week Report', month: 'Month Report' }
 
@@ -77,10 +72,6 @@ export default function Progress() {
         <div className={styles.errorWrap}>
           <p className={styles.errorMsg}>⚠️ {error}</p>
           <button className={styles.retryBtn} onClick={() => setPeriod(p => p)}>Retry</button>
-        </div>
-      ) : noData ? (
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '16px' }}>
-          <EmptyMealState />
         </div>
       ) : data ? (
         <>

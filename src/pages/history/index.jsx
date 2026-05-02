@@ -6,11 +6,10 @@ import MealCard from '../../components/MealCard'
 import EmptyMealState from '../../components/EmptyMealState'
 import { SkeletonMealCard } from '../../components/Skeleton'
 import styles from './history.module.css'
-
-const API_URL = import.meta.env.VITE_API_URL || '/api'
+import { API_BASE } from '../../utils/api.js'
 
 async function apiFetch(path) {
-  const res = await fetch(`${API_URL}${path}`, { credentials: 'include' })
+  const res = await fetch(`${API_BASE}${path}`, { credentials: 'include' })
   if (!res.ok) throw new Error('API error')
   return res.json()
 }

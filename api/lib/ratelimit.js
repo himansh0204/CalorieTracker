@@ -33,8 +33,21 @@ export const weeklyReportLimiter = redis
   ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '1 h'), prefix: 'rl:report' })
   : null
 
+// 5 auth attempts per IP per minute
+export const authLimiter = redis
+  ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '1 m'), prefix: 'rl:auth' })
+  : null
+
+// 3 account deletions per user per hour
+export const accountDeletionLimiter = redis
+  ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '1 h'), prefix: 'rl:del' })
+  : null
+
 export async function checkLimit(limiter, identifier) {
-  if (!limiter) return true  // Upstash not configured — allow through
+  if (!limiter) {
+    // Upstash not configured — fail-closed in production, allow through in dev
+    return process.env.NODE_ENV !== 'production'
+  }
   const { success } = await limiter.limit(identifier)
   return success
 }

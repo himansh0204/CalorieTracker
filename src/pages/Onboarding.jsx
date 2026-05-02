@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import styles from './Onboarding.module.css'
 import { useToast } from '../context/ToastContext'
-
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
+import { API_BASE } from '../utils/api.js'
 
 const ACTIVITY_OPTIONS = [
   { value: 'sedentary', label: 'Sedentary', desc: 'desk job, little or no exercise' },

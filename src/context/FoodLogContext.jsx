@@ -1,9 +1,9 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from './AuthContext'
+import { API_BASE, withTimeout } from '../utils/api.js'
 
 const FoodLogContext = createContext(null)
 const MEAL_SAVE_TIMEOUT_MS = 7000
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
 export function FoodLogProvider({ children }) {
   const { user } = useAuth()
@@ -193,11 +193,3 @@ function todayStr() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-function withTimeout(promise, timeoutMs) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('meal-save-timeout')), timeoutMs)
-    }),
-  ])
-}

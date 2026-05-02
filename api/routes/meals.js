@@ -22,8 +22,23 @@ router.post('/', verifyToken, async (req, res) => {
 
     const { foodName, calories, protein, carbs, fat, servingSize, foodId } = req.body
 
-    if (!foodName || calories === undefined) {
-      return res.status(400).json({ error: 'foodName and calories required' })
+    if (!foodName || typeof foodName !== 'string' || !foodName.trim()) {
+      return res.status(400).json({ error: 'foodName is required' })
+    }
+    if (foodName.length > 255) {
+      return res.status(400).json({ error: 'foodName must be 255 characters or fewer' })
+    }
+    if (calories === undefined || isNaN(Number(calories)) || Number(calories) < 0 || Number(calories) > 9999) {
+      return res.status(400).json({ error: 'calories must be between 0 and 9999' })
+    }
+    if (protein !== undefined && (isNaN(Number(protein)) || Number(protein) < 0 || Number(protein) > 999)) {
+      return res.status(400).json({ error: 'protein must be between 0 and 999' })
+    }
+    if (carbs !== undefined && (isNaN(Number(carbs)) || Number(carbs) < 0 || Number(carbs) > 999)) {
+      return res.status(400).json({ error: 'carbs must be between 0 and 999' })
+    }
+    if (fat !== undefined && (isNaN(Number(fat)) || Number(fat) < 0 || Number(fat) > 999)) {
+      return res.status(400).json({ error: 'fat must be between 0 and 999' })
     }
 
     const result = await query(
@@ -98,8 +113,20 @@ router.put('/:mealId', verifyToken, async (req, res) => {
     if (!foodName || typeof foodName !== 'string' || !foodName.trim()) {
       return res.status(400).json({ error: 'foodName is required' })
     }
-    if (calories === undefined || isNaN(Number(calories)) || Number(calories) < 0) {
-      return res.status(400).json({ error: 'calories must be a non-negative number' })
+    if (foodName.length > 255) {
+      return res.status(400).json({ error: 'foodName must be 255 characters or fewer' })
+    }
+    if (calories === undefined || isNaN(Number(calories)) || Number(calories) < 0 || Number(calories) > 9999) {
+      return res.status(400).json({ error: 'calories must be between 0 and 9999' })
+    }
+    if (protein !== undefined && (isNaN(Number(protein)) || Number(protein) < 0 || Number(protein) > 999)) {
+      return res.status(400).json({ error: 'protein must be between 0 and 999' })
+    }
+    if (carbs !== undefined && (isNaN(Number(carbs)) || Number(carbs) < 0 || Number(carbs) > 999)) {
+      return res.status(400).json({ error: 'carbs must be between 0 and 999' })
+    }
+    if (fat !== undefined && (isNaN(Number(fat)) || Number(fat) < 0 || Number(fat) > 999)) {
+      return res.status(400).json({ error: 'fat must be between 0 and 999' })
     }
 
     const result = await query(
@@ -205,7 +232,7 @@ Use realistic estimates based on typical portion sizes. All nutrient values must
           ],
         },
       ],
-    })
+    }, { signal: AbortSignal.timeout(15000) })
 
     const content = response.choices[0]?.message?.content?.trim()
     if (!content) {
@@ -216,25 +243,39 @@ Use realistic estimates based on typical portion sizes. All nutrient values must
     try {
       parsed = JSON.parse(content)
     } catch {
+      // AI sometimes wraps JSON in markdown — strip and retry once
       const jsonMatch = content.match(/\{[\s\S]*\}/)
       if (!jsonMatch) {
         return res.status(502).json({ error: 'Could not parse AI response' })
       }
-      parsed = JSON.parse(jsonMatch[0])
+      try {
+        parsed = JSON.parse(jsonMatch[0])
+      } catch {
+        return res.status(502).json({ error: 'Could not parse AI response' })
+      }
     }
 
     if (parsed.error === 'no_food') {
       return res.status(422).json({ error: 'No food detected. Please take a photo of a meal.' })
     }
 
+    const calories = Math.round(Number(parsed.calories) || 0)
+    const protein = Math.round(Number(parsed.protein) || 0)
+    const carbs = Math.round(Number(parsed.carbs) || 0)
+    const fat = Math.round(Number(parsed.fat) || 0)
+
+    if (!parsed.foodName || calories > 9999 || protein > 999 || carbs > 999 || fat > 999) {
+      return res.status(502).json({ error: 'AI returned invalid nutritional data' })
+    }
+
     res.json({
       ok: true,
-      foodName: parsed.foodName || 'Unknown meal',
+      foodName: parsed.foodName,
       description: parsed.description || '',
-      calories: Math.round(Number(parsed.calories) || 0),
-      protein: Math.round(Number(parsed.protein) || 0),
-      carbs: Math.round(Number(parsed.carbs) || 0),
-      fat: Math.round(Number(parsed.fat) || 0),
+      calories,
+      protein,
+      carbs,
+      fat,
       servingSize: parsed.servingSize || '1 serving',
     })
   } catch (error) {

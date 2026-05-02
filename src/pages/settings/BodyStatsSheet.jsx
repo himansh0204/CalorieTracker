@@ -4,8 +4,7 @@ import sheetStyles from './Sheet.module.css'
 import styles from './BodyStatsSheet.module.css'
 import { ACTIVITY_OPTIONS, calcGoals } from './settingsConstants'
 import { useToast } from '../../context/ToastContext'
-
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
+import { API_BASE } from '../../utils/api.js'
 
 export default function BodyStatsSheet({ settings, onClose, onSaved }) {
   const [form, setForm] = useState({

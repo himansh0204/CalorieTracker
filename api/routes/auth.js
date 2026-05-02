@@ -2,12 +2,18 @@ import express from 'express'
 import { OAuth2Client } from 'google-auth-library'
 import { query } from '../lib/db.js'
 import { generateToken, verifyToken, cookieOptions } from '../middleware/auth.js'
+import { checkLimit, authLimiter, accountDeletionLimiter } from '../lib/ratelimit.js'
 
 const router = express.Router()
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 router.post('/google', async (req, res) => {
   try {
+    const ip = req.ip || 'unknown'
+    if (!await checkLimit(authLimiter, `ip:${ip}`)) {
+      return res.status(429).json({ error: 'Too many login attempts. Please try again later.' })
+    }
+
     const { idToken } = req.body
 
     if (!idToken) {
@@ -79,7 +85,16 @@ router.post('/logout', (_req, res) => {
 router.delete('/account', verifyToken, async (req, res) => {
   try {
     const userId = req.userId
-    await query('DELETE FROM analytics_events WHERE user_id = $1', [userId])
+    if (!await checkLimit(accountDeletionLimiter, String(userId))) {
+      return res.status(429).json({ error: 'Too many requests. Please try again later.' })
+    }
+    // GDPR audit record — persisted in a separate table or log before data is wiped
+    await query(
+      `INSERT INTO analytics_events (user_id, event_type, event_data)
+       VALUES ($1, 'account_deleted', $2)`,
+      [userId, JSON.stringify({ deletedAt: new Date().toISOString(), ip: req.ip })]
+    )
+    await query('DELETE FROM analytics_events WHERE user_id = $1 AND event_type != $2', [userId, 'account_deleted'])
     await query('DELETE FROM meals WHERE user_id = $1', [userId])
     await query('DELETE FROM user_settings WHERE user_id = $1', [userId])
     await query('DELETE FROM users WHERE id = $1', [userId])

@@ -6,8 +6,9 @@ import PageHeader from '../../components/PageHeader'
 import { IconAdd } from '../../components/icons'
 import styles from './addmeal.module.css'
 
+import { API_BASE } from '../../utils/api.js'
+
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack']
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
 export default function AddMeal() {
   const navigate = useNavigate()

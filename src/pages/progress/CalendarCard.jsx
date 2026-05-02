@@ -1,7 +1,7 @@
 import { useState, useEffect, Fragment } from 'react'
 import styles from './progress.module.css'
+import { API_BASE } from '../../utils/api.js'
 
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
 function buildMonthGrid(year, month) {

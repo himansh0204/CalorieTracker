@@ -577,11 +577,24 @@
   font-weight: 700;
 }
 
-.seeAll {
-  font-size: 0.78rem;
+.reportBtn {
+  padding: 7px 12px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1.5px solid rgba(139, 92, 246, 0.4);
+  border-radius: 12px;
+  color: #a78bfa;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: var(--primary);
-  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.reportBtn:active {
+  background: rgba(139, 92, 246, 0.25);
+  border-color: rgba(139, 92, 246, 0.6);
 }
 
 .empty {

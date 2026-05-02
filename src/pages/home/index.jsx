@@ -8,8 +8,7 @@ import WeeklyReportSheet from './WeeklyReportSheet'
 import MealList from './MealList'
 import { useAnalytics } from './useAnalytics'
 import styles from './home.module.css'
-
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
+import { API_BASE } from '../../utils/api.js'
 
 export default function Home() {
   const { meals, visibleMeals, totals, loading, selectedDate, setSelectedDate } = useFoodLog()
@@ -69,7 +68,7 @@ export default function Home() {
         onRetry={openReport}
       />
 
-      <MealList meals={visibleMeals} loading={loading} selectedDate={selectedDate} />
+      <MealList meals={visibleMeals} loading={loading} selectedDate={selectedDate} onReportClick={openReport} />
     </div>
   )
 }

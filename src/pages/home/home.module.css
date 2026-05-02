@@ -178,15 +178,15 @@
   color: var(--primary);
 }
 
-/* Logged + under/at goal (not selected) — gold solid ring */
+/* Logged + under/at goal (not selected) — blue solid ring */
 .weekLogged {
   border-style: solid;
-  border-color: rgba(255, 255, 255, 0.6);
+  border-color: #3b82f6;
   border-width: 2px;
 }
 
 .weekLogged .weekNum {
-  color: var(--primary);
+  color: #60a5fa;
 }
 
 /* Logged + over goal (not selected) — red solid ring */

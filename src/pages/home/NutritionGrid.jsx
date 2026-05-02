@@ -18,8 +18,8 @@ export default function NutritionGrid({ totals, settings }) {
             className={styles.ring}
             style={{
   '--pct': caloriePercent,
-  '--color-start': isOver ? '#ef4444' : '#f59e0b',
-  '--color-end':   isOver ? '#fca5a5' : '#fef08a',
+  '--color-start': isOver ? '#ef4444' : '#3b82f6',
+  '--color-end':   isOver ? '#fca5a5' : '#60a5fa',
 }}
           >
             <div className={styles.ringInner}>
@@ -45,7 +45,7 @@ export default function NutritionGrid({ totals, settings }) {
           const isOver     = value > goal
           const background = isOver
             ? 'linear-gradient(90deg, #ef4444, #fca5a5)'
-            : 'linear-gradient(90deg, #f59e0b, #fef08a)'
+            : 'linear-gradient(90deg, #3b82f6, #60a5fa)'
           return (
             <div key={label} className={styles.macroCard}>
               <div className={styles.cardHeader}>

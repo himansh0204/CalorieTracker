@@ -3,9 +3,9 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "YOUR_PACKAGE_NAME",
+      "package_name": "app.vercel.calorie_tracker_three_delta.twa",
       "sha256_cert_fingerprints": [
-        "YOUR_SHA256_FINGERPRINT"
+        "25:B6:4F:0F:A1:6B:D5:A3:D4:ED:B8:3C:E7:50:6B:EA:2B:22:AD:B6:5C:A3:29:3E:2C:11:FA:91:92:CB:38:97"
       ]
     }
   }

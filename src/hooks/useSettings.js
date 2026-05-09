@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { API_BASE, withTimeout } from '../utils/api.js'
+import { API_BASE, withTimeout, apiFetch } from '../utils/api.js'
 
 const DEFAULTS = {
   calorieGoal: 2000,
@@ -38,7 +38,7 @@ export function useSettings() {
     setLoading(true)
     try {
       const response = await withTimeout(
-        fetch(`${API_BASE}/settings`, {
+        apiFetch(`${API_BASE}/settings`, {
           credentials: 'include',
         }),
         SETTINGS_TIMEOUT_MS
@@ -96,7 +96,7 @@ export function useSettings() {
 
     try {
       const response = await withTimeout(
-        fetch(`${API_BASE}/settings`, {
+        apiFetch(`${API_BASE}/settings`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',

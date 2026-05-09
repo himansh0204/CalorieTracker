@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from './AuthContext'
-import { API_BASE, withTimeout } from '../utils/api.js'
+import { API_BASE, withTimeout, apiFetch } from '../utils/api.js'
 
 const FoodLogContext = createContext(null)
 const MEAL_SAVE_TIMEOUT_MS = 7000
@@ -21,7 +21,7 @@ export function FoodLogProvider({ children }) {
     setLoading(true)
     try {
       const response = await withTimeout(
-        fetch(`${API_BASE}/meals?startDate=${selectedDate}&endDate=${selectedDate}`, {
+        apiFetch(`${API_BASE}/meals?startDate=${selectedDate}&endDate=${selectedDate}`, {
           credentials: 'include',
         }),
         MEAL_SAVE_TIMEOUT_MS
@@ -41,7 +41,7 @@ export function FoodLogProvider({ children }) {
     if (!user) return
 
     const data = await withTimeout(
-      fetch(`${API_BASE}/meals`, {
+      apiFetch(`${API_BASE}/meals`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -80,7 +80,7 @@ export function FoodLogProvider({ children }) {
 
   async function updateMeal(mealId, data) {
     if (!user) return
-    const res = await fetch(`${API_BASE}/meals/${mealId}`, {
+    const res = await apiFetch(`${API_BASE}/meals/${mealId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -97,7 +97,7 @@ export function FoodLogProvider({ children }) {
   async function removeMeal(mealId) {
     if (!user) return
 
-    const res = await fetch(`${API_BASE}/meals/${mealId}`, {
+    const res = await apiFetch(`${API_BASE}/meals/${mealId}`, {
       method: 'DELETE',
       credentials: 'include',
     })
@@ -117,7 +117,7 @@ export function FoodLogProvider({ children }) {
 
     pendingDeleteTimers.current[mealId] = setTimeout(async () => {
       try {
-        const res = await fetch(`${API_BASE}/meals/${mealId}`, {
+        const res = await apiFetch(`${API_BASE}/meals/${mealId}`, {
           method: 'DELETE',
           credentials: 'include',
         })

@@ -24,7 +24,7 @@ export function generateToken(userId, googleId) {
   return jwt.sign(
     { userId, googleId },
     process.env.JWT_SECRET,
-    { expiresIn: '24h' }
+    { expiresIn: '7d' }
   )
 }
 
@@ -33,7 +33,7 @@ export function cookieOptions() {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
     path: '/',
   }
 }

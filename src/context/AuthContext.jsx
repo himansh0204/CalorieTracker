@@ -20,6 +20,13 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false))
   }, [])
 
+  // Auto-logout when any API call returns 401 (expired token)
+  useEffect(() => {
+    function onUnauthorized() { logout() }
+    window.addEventListener('caltrack:unauthorized', onUnauthorized)
+    return () => window.removeEventListener('caltrack:unauthorized', onUnauthorized)
+  }, [])
+
   async function handleCredential(idToken) {
     setLoading(true)
     setError(null)

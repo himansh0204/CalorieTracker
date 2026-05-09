@@ -24,8 +24,11 @@ self.addEventListener('fetch', (e) => {
   }
 
   const url = new URL(e.request.url)
-  // Don't cache Firebase / API calls
-  if (url.hostname.includes('firebase') || url.hostname.includes('openfoodfacts')) return
+  if (
+    url.hostname.includes('firebase') ||
+    url.hostname.includes('openfoodfacts') ||
+    url.pathname.startsWith('/api/')
+  ) return
 
   e.respondWith(
     caches.match(e.request).then((cached) => {
